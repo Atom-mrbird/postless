@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Connections - Postless{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Connections</h1>
+            <p class="text-gray-500 mt-1">Manage your connected social media accounts and integrations.</p>
+        </div>
+        <button class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-indigo-600 transition-colors shadow-sm">
+            <i class="fa-solid fa-plus mr-2"></i> Add New Platform
+        </button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Instagram Connection Card -->
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 rounded-xl flex items-center justify-center text-white text-2xl shadow-sm">
+                        <i class="fa-brands fa-instagram"></i>
+                    </div>
+                    {% if instagram_connected %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Connected
+                    </span>
+                    {% else %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        Not Connected
+                    </span>
+                    {% endif %}
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Instagram</h3>
+                <p class="text-sm text-gray-500 mt-1">Share photos, reels, and stories directly to your feed.</p>
+
+                <div class="mt-6 pt-6 border-t border-gray-100">
+                    {% if instagram_connected %}
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-8 h-8 rounded-full bg-gray-200 overflow-hidden">
+                            <img src="https://placehold.co/100x100" alt="Profile" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">@fashion_daily</p>
+                            <p class="text-xs text-gray-500">Business Account</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <button class="flex-1 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                            Settings
+                        </button>
+                        <button class="px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors">
+                            Disconnect
+                        </button>
+                    </div>
+                    {% else %}
+                    <a href="/api/social-accounts/instagram_login/" class="w-full px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg text-sm font-medium hover:from-purple-700 hover:to-pink-700 transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-brands fa-instagram"></i> Connect Instagram
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- YouTube Connection Card -->
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center text-white text-2xl shadow-sm">
+                        <i class="fa-brands fa-youtube"></i>
+                    </div>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        Not Connected
+                    </span>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">YouTube</h3>
+                <p class="text-sm text-gray-500 mt-1">Upload long-form videos and Shorts to your channel.</p>
+
+                <div class="mt-6 pt-6 border-t border-gray-100">
+                    <button class="w-full px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-link"></i> Connect Account
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TikTok (Coming Soon) -->
+        <div class="bg-gray-50 rounded-xl border border-gray-200 border-dashed p-6 flex flex-col items-center justify-center text-center opacity-75">
+            <div class="w-12 h-12 bg-gray-200 rounded-xl flex items-center justify-center text-gray-400 text-2xl mb-4">
+                <i class="fa-brands fa-tiktok"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900">TikTok</h3>
+            <p class="text-sm text-gray-500 mt-1">Short-form video scheduling coming soon.</p>
+            <button class="mt-4 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-400 cursor-not-allowed">
+                Notify Me
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

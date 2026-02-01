@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Postless - Autonomous Content{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1', // Indigo 500
+                        secondary: '#1e293b', // Slate 800
+                        dark: '#0f172a', // Slate 900
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
+            <div class="h-16 flex items-center px-6 border-b border-gray-200">
+                <div class="flex items-center gap-2 text-primary font-bold text-xl">
+                    <i class="fa-solid fa-bolt"></i>
+                    <span>Postless</span>
+                </div>
+            </div>
+
+            <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+                <a href="/" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50 hover:text-primary transition-colors {% if request.path == '/' %}bg-indigo-50 text-primary font-medium{% endif %}">
+                    <i class="fa-solid fa-chart-pie w-5"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/schedule/" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50 hover:text-primary transition-colors {% if 'schedule' in request.path %}bg-indigo-50 text-primary font-medium{% endif %}">
+                    <i class="fa-solid fa-calendar-days w-5"></i>
+                    <span>Schedule</span>
+                </a>
+                <a href="/content/" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50 hover:text-primary transition-colors {% if 'content' in request.path %}bg-indigo-50 text-primary font-medium{% endif %}">
+                    <i class="fa-solid fa-photo-film w-5"></i>
+                    <span>Media Library</span>
+                </a>
+                <a href="/ai/" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50 hover:text-primary transition-colors {% if 'ai' in request.path %}bg-indigo-50 text-primary font-medium{% endif %}">
+                    <i class="fa-solid fa-wand-magic-sparkles w-5"></i>
+                    <span>AI Generator</span>
+                </a>
+                <a href="/analytics/" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50 hover:text-primary transition-colors {% if 'analytics' in request.path %}bg-indigo-50 text-primary font-medium{% endif %}">
+                    <i class="fa-solid fa-chart-line w-5"></i>
+                    <span>Analytics</span>
+                </a>
+                <div class="pt-4 mt-4 border-t border-gray-100">
+                    <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Settings</p>
+                    <a href="/connections/" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50 hover:text-primary transition-colors">
+                        <i class="fa-solid fa-link w-5"></i>
+                        <span>Connections</span>
+                    </a>
+                    <a href="/settings/" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50 hover:text-primary transition-colors">
+                        <i class="fa-solid fa-gear w-5"></i>
+                        <span>Settings</span>
+                    </a>
+                </div>
+            </nav>
+
+            <div class="p-4 border-t border-gray-200">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-primary font-bold">
+                        {{ request.user.username|slice:":1"|upper|default:"U" }}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-gray-900 truncate">{{ request.user.username|default:"User" }}</p>
+                        <p class="text-xs text-gray-500 truncate">{{ request.user.email|default:"user@example.com" }}</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col h-screen overflow-hidden bg-gray-50">
+            <!-- Top Header (Mobile) -->
+            <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 md:hidden">
+                <div class="font-bold text-xl text-primary">Postless</div>
+                <button class="text-gray-500 hover:text-gray-700">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </header>
+
+            <!-- Content Scroll Area -->
+            <div class="flex-1 overflow-y-auto p-6 md:p-8">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

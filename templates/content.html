@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Media Library - Postless{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Media Library</h1>
+            <p class="text-gray-500 mt-1">Organize and manage your images, videos, and generated content.</p>
+        </div>
+        <div class="flex gap-3">
+            <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Upload
+            </button>
+            <a href="/ai/" class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-indigo-600 transition-colors shadow-sm">
+                <i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Generate New
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="flex items-center gap-4 mb-6 overflow-x-auto pb-2">
+        <button class="px-4 py-2 bg-gray-900 text-white rounded-full text-sm font-medium whitespace-nowrap">All Media</button>
+        <button class="px-4 py-2 bg-white border border-gray-200 text-gray-600 rounded-full text-sm font-medium hover:bg-gray-50 whitespace-nowrap">Images</button>
+        <button class="px-4 py-2 bg-white border border-gray-200 text-gray-600 rounded-full text-sm font-medium hover:bg-gray-50 whitespace-nowrap">Videos</button>
+        <button class="px-4 py-2 bg-white border border-gray-200 text-gray-600 rounded-full text-sm font-medium hover:bg-gray-50 whitespace-nowrap">AI Generated</button>
+        <div class="flex-1"></div>
+        <div class="relative">
+            <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+            <input type="text" placeholder="Search files..." class="pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-primary w-64">
+        </div>
+    </div>
+
+    <!-- Media Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+        <!-- Upload New Card -->
+        <div class="aspect-square bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center text-gray-400 hover:border-primary hover:text-primary hover:bg-indigo-50/50 transition-all cursor-pointer group">
+            <div class="w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-plus text-lg"></i>
+            </div>
+            <span class="text-sm font-medium">Upload New</span>
+        </div>
+
+        <!-- Media Item 1 -->
+        <div class="group relative aspect-square bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
+            <img src="https://placehold.co/400x400" alt="Media" class="w-full h-full object-cover transition-transform group-hover:scale-105">
+            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                <button class="p-2 bg-white rounded-full text-gray-900 hover:text-primary"><i class="fa-solid fa-pen"></i></button>
+                <button class="p-2 bg-white rounded-full text-gray-900 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
+            </div>
+            <div class="absolute bottom-2 left-2 right-2">
+                <span class="inline-block px-2 py-1 bg-black/60 backdrop-blur-sm text-white text-xs rounded-md">IMG_2024.jpg</span>
+            </div>
+        </div>
+
+        <!-- Media Item 2 (Video) -->
+        <div class="group relative aspect-square bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
+            <img src="https://placehold.co/400x400/333/fff" alt="Media" class="w-full h-full object-cover transition-transform group-hover:scale-105">
+            <div class="absolute top-2 right-2 w-8 h-8 bg-black/60 backdrop-blur-sm rounded-full flex items-center justify-center text-white text-xs">
+                <i class="fa-solid fa-video"></i>
+            </div>
+            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                <button class="p-2 bg-white rounded-full text-gray-900 hover:text-primary"><i class="fa-solid fa-play"></i></button>
+                <button class="p-2 bg-white rounded-full text-gray-900 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
+            </div>
+            <div class="absolute bottom-2 left-2 right-2">
+                <span class="inline-block px-2 py-1 bg-black/60 backdrop-blur-sm text-white text-xs rounded-md">Review_V1.mp4</span>
+            </div>
+        </div>
+
+        <!-- Generate more placeholders -->
+        {% for i in "123456"|make_list %}
+        <div class="group relative aspect-square bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
+            <img src="https://placehold.co/400x400?text=Media+{{ i }}" alt="Media" class="w-full h-full object-cover transition-transform group-hover:scale-105">
+            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                <button class="p-2 bg-white rounded-full text-gray-900 hover:text-primary"><i class="fa-solid fa-pen"></i></button>
+                <button class="p-2 bg-white rounded-full text-gray-900 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
