@@ -15,6 +15,9 @@ from django.views.decorators.csrf import csrf_exempt
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
 import googleapiclient.errors
+import json
+import base64
+import os
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -45,6 +48,11 @@ class SocialAccountViewSet(viewsets.ModelViewSet):
             'instagram_business_manage_insights',
         ])
 
+        # Encode user ID into state to persist across redirect
+        state_data = {'user_id': request.user.id, 'nonce': 'postless_auth_state'}
+        state_json = json.dumps(state_data)
+        state_encoded = base64.urlsafe_b64encode(state_json.encode()).decode()
+
         # ✅ Instagram Platform için doğru URL: api.instagram.com
         auth_url = (
             f"https://api.instagram.com/oauth/authorize"
@@ -52,7 +60,7 @@ class SocialAccountViewSet(viewsets.ModelViewSet):
             f"&redirect_uri={REDIRECT_URI}"
             f"&scope={SCOPE}"
             f"&response_type=code"
-            f"&state=postless_auth_state"
+            f"&state={state_encoded}"
         )
 
         return redirect(auth_url)
@@ -77,12 +85,26 @@ class SocialAccountViewSet(viewsets.ModelViewSet):
 
         # --- OAuth callback: code → access_token ---
         if request.method == "GET" and request.GET.get("code"):
-            # 🚨 CRITICAL FIX: Ensure user is logged in before processing OAuth callback
-            if not request.user.is_authenticated:
-                print("DEBUG: User not authenticated in callback, redirecting to login.")
-                return redirect('/accounts/login/?next=/connections/')
-
             code = request.GET.get("code")
+            state_encoded = request.GET.get("state")
+            
+            user = request.user
+            
+            # If session auth failed, try to recover user from state
+            if not user.is_authenticated and state_encoded:
+                try:
+                    state_json = base64.urlsafe_b64decode(state_encoded).decode()
+                    state_data = json.loads(state_json)
+                    user_id = state_data.get('user_id')
+                    if user_id:
+                        user = User.objects.get(id=user_id)
+                        print(f"DEBUG: Recovered user from state: {user.username}")
+                except Exception as e:
+                    print(f"DEBUG: Failed to decode state: {e}")
+
+            if not user or not user.is_authenticated:
+                print("DEBUG: User could not be authenticated even with state recovery.")
+                return redirect('/accounts/login/?next=/connections/')
 
             APP_ID = getattr(settings, 'INSTAGRAM_APP_ID', '1640423764050164')
             APP_SECRET = getattr(settings, 'INSTAGRAM_CLIENT_SECRET', '')
@@ -132,11 +154,11 @@ class SocialAccountViewSet(viewsets.ModelViewSet):
             profile = profile_response.json()
             username = profile.get("username") or profile.get("name", "Instagram User")
 
-            print(f"DEBUG: Saving Instagram account for user {request.user.username}: {username} ({ig_user_id})")
+            print(f"DEBUG: Saving Instagram account for user {user.username}: {username} ({ig_user_id})")
 
             # Veritabanına kaydet
             obj, created = SocialAccount.objects.update_or_create(
-                user=request.user,
+                user=user, # Use the recovered user object
                 platform='Instagram',
                 account_id=str(ig_user_id),
                 defaults={
@@ -180,11 +202,19 @@ class SocialAccountViewSet(viewsets.ModelViewSet):
         )
 
         flow.redirect_uri = REDIRECT_URI
+        
+        # Encode user ID into state
+        state_data = {'user_id': request.user.id, 'nonce': os.urandom(8).hex()}
+        state_json = json.dumps(state_data)
+        state_encoded = base64.urlsafe_b64encode(state_json.encode()).decode()
+        
         authorization_url, state = flow.authorization_url(
             access_type='offline',
-            include_granted_scopes='true'
+            include_granted_scopes='true',
+            state=state_encoded
         )
 
+        # Still try to save to session as backup
         request.session['youtube_oauth_state'] = state
         return redirect(authorization_url)
 
@@ -193,9 +223,31 @@ class SocialAccountViewSet(viewsets.ModelViewSet):
         """
         Handles the callback from Google/YouTube.
         """
-        state = request.session.get('youtube_oauth_state')
+        # Try to get state from URL first
+        state = request.GET.get('state')
+        
+        # Fallback to session if URL state is missing (unlikely in callback)
         if not state:
-            return JsonResponse({'error': 'Missing state parameter in session'}, status=400)
+            state = request.session.get('youtube_oauth_state')
+            
+        if not state:
+            return JsonResponse({'error': 'Missing state parameter'}, status=400)
+
+        # Recover User from State
+        user = request.user
+        if not user.is_authenticated:
+            try:
+                state_json = base64.urlsafe_b64decode(state).decode()
+                state_data = json.loads(state_json)
+                user_id = state_data.get('user_id')
+                if user_id:
+                    user = User.objects.get(id=user_id)
+                    print(f"DEBUG: Recovered YouTube user from state: {user.username}")
+            except Exception as e:
+                print(f"DEBUG: Failed to decode YouTube state: {e}")
+        
+        if not user or not user.is_authenticated:
+             return redirect('/accounts/login/?next=/connections/')
 
         CLIENT_ID = getattr(settings, 'YOUTUBE_CLIENT_ID', '')
         CLIENT_SECRET = getattr(settings, 'YOUTUBE_CLIENT_SECRET', '')
@@ -222,6 +274,7 @@ class SocialAccountViewSet(viewsets.ModelViewSet):
             )
 
             flow.redirect_uri = REDIRECT_URI
+            
             authorization_response = request.build_absolute_uri()
             if 'http:' in authorization_response and not settings.DEBUG:
                 authorization_response = authorization_response.replace('http:', 'https:')
@@ -238,7 +291,7 @@ class SocialAccountViewSet(viewsets.ModelViewSet):
                 channel_title = channel['snippet']['title']
 
                 SocialAccount.objects.update_or_create(
-                    user=request.user,
+                    user=user, # Use recovered user
                     platform='YouTube',
                     account_id=channel_id,
                     defaults={
@@ -253,6 +306,7 @@ class SocialAccountViewSet(viewsets.ModelViewSet):
                 return JsonResponse({'error': 'No YouTube channel found for this account.'}, status=400)
 
         except Exception as e:
+            print(f"DEBUG: YouTube Callback Error: {str(e)}")
             return JsonResponse({'error': 'YouTube Auth Error', 'details': str(e)}, status=500)
 
 

@@ -34,13 +34,6 @@ CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:8000'
 ]
 
-# Session and Cookie Settings for Ngrok/HTTPS
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-SESSION_COOKIE_SECURE = True
-SESSION_COOKIE_SAMESITE = 'None'
-CSRF_COOKIE_SECURE = True
-CSRF_COOKIE_SAMESITE = 'None'
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -174,5 +167,13 @@ INSTAGRAM_VERIFY_TOKEN = 'IGAAXT9Ou8wPRBZAGF2RC1JVndKYW5aeEEzZAFJUU3BiRnJJY01HYX
 
 # YouTube Configuration
 YOUTUBE_CLIENT_ID = os.environ.get('YOUTUBE_CLIENT_ID', '935602501203-vfpajcescc17kg3nbei7ck8nrulf33k7.apps.googleusercontent.com')
-YOUTUBE_CLIENT_SECRET = os.environ.get('YOUTUBE_CLIENT_SECRET', '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ß')
+YOUTUBE_CLIENT_SECRET = os.environ.get('YOUTUBE_CLIENT_SECRET', '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')
 YOUTUBE_REDIRECT_URI = 'https://clementine-unlegalized-nichole.ngrok-free.dev/api/social-accounts/youtube_callback/'
+
+# Session and Cookie Settings for Ngrok/HTTPS (CRITICAL)
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = 'None'
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
