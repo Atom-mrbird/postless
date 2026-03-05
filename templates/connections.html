@@ -22,7 +22,7 @@
                     <div class="w-12 h-12 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 rounded-xl flex items-center justify-center text-white text-2xl shadow-sm">
                         <i class="fa-brands fa-instagram"></i>
                     </div>
-                    {% if instagram_connected %}
+                    {% if instagram_account %}
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                         Connected
                     </span>
@@ -36,13 +36,13 @@
                 <p class="text-sm text-gray-500 mt-1">Share photos, reels, and stories directly to your feed.</p>
 
                 <div class="mt-6 pt-6 border-t border-gray-100">
-                    {% if instagram_connected %}
+                    {% if instagram_account %}
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="w-8 h-8 rounded-full bg-gray-200 overflow-hidden">
-                            <img src="https://placehold.co/100x100" alt="Profile" class="w-full h-full object-cover">
+                        <div class="w-8 h-8 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center text-gray-400 text-xs font-bold">
+                            {{ instagram_account.account_name|slice:":2"|upper }}
                         </div>
                         <div>
-                            <p class="text-sm font-medium text-gray-900">@fashion_daily</p>
+                            <p class="text-sm font-medium text-gray-900">@{{ instagram_account.account_name }}</p>
                             <p class="text-xs text-gray-500">Business Account</p>
                         </div>
                     </div>
@@ -70,17 +70,43 @@
                     <div class="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center text-white text-2xl shadow-sm">
                         <i class="fa-brands fa-youtube"></i>
                     </div>
+                    {% if youtube_account %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Connected
+                    </span>
+                    {% else %}
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                         Not Connected
                     </span>
+                    {% endif %}
                 </div>
                 <h3 class="text-lg font-bold text-gray-900">YouTube</h3>
                 <p class="text-sm text-gray-500 mt-1">Upload long-form videos and Shorts to your channel.</p>
 
                 <div class="mt-6 pt-6 border-t border-gray-100">
-                    <button class="w-full px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-link"></i> Connect Account
-                    </button>
+                    {% if youtube_account %}
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-8 h-8 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center text-gray-400 text-xs font-bold">
+                            {{ youtube_account.account_name|slice:":2"|upper }}
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">{{ youtube_account.account_name }}</p>
+                            <p class="text-xs text-gray-500">YouTube Channel</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <button class="flex-1 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                            Settings
+                        </button>
+                        <button class="px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors">
+                            Disconnect
+                        </button>
+                    </div>
+                    {% else %}
+                    <a href="/api/social-accounts/youtube_login/" class="w-full px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-brands fa-youtube"></i> Connect YouTube
+                    </a>
+                    {% endif %}
                 </div>
             </div>
         </div>

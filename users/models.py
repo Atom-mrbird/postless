@@ -8,6 +8,7 @@ class SocialAccount(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='social_accounts')
     platform = models.CharField(max_length=50) # e.g., 'Instagram', 'YouTube'
     account_id = models.CharField(max_length=255)
+    account_name = models.CharField(max_length=255, blank=True, null=True) # Added for display name
     access_token = models.TextField()
     refresh_token = models.TextField(blank=True, null=True)
     expires_at = models.DateTimeField(blank=True, null=True)

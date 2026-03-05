@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from users.views import UserViewSet, SocialAccountViewSet, connections_page
+from users.views import UserViewSet, SocialAccountViewSet, connections_page, instagram_webhook
 from content.views import ContentViewSet
 from ai_generation.views import AIPromptViewSet
 from scheduling.views import ScheduleViewSet
@@ -19,11 +19,13 @@ router.register(r'analytics', AnalyticsDataViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
-    path('accounts/', include('django.contrib.auth.urls')), # Added auth URLs
+    path('api/social-accounts/instagram_callback/', instagram_webhook, name='instagram_webhook'), # Added webhook URL
+    path('accounts/', include('django.contrib.auth.urls')),
     path('', TemplateView.as_view(template_name='dashboard.html'), name='dashboard'),
     path('schedule/', TemplateView.as_view(template_name='schedule.html'), name='schedule'),
     path('content/', TemplateView.as_view(template_name='content.html'), name='content'),
     path('ai/', TemplateView.as_view(template_name='ai_generator.html'), name='ai_generator'),
     path('analytics/', TemplateView.as_view(template_name='analytics.html'), name='analytics'),
     path('connections/', connections_page, name='connections'),
+    path('privacy-policy/', TemplateView.as_view(template_name='privacy_policy.html'), name='privacy_policy'),
 ]

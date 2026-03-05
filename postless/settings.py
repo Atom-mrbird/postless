@@ -26,9 +26,20 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-vf*0g94mj7j_m$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['clementine-unlegalized-nichole.ngrok-free.dev']
+ALLOWED_HOSTS = ['clementine-unlegalized-nichole.ngrok-free.dev', 'localhost', '127.0.0.1']
 
-CSRF_TRUSTED_ORIGINS = ['https://clementine-unlegalized-nichole.ngrok-free.dev']
+CSRF_TRUSTED_ORIGINS = [
+    'https://clementine-unlegalized-nichole.ngrok-free.dev',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000'
+]
+
+# Session and Cookie Settings for Ngrok/HTTPS
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = 'None'
 
 # Application definition
 
@@ -40,7 +51,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
     'users',
     'content',
     'ai_generation',
@@ -130,16 +140,6 @@ STATIC_URL = 'static/'
 
 AUTH_USER_MODEL = 'users.User'
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
-}
-
 # Celery Configuration
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
@@ -151,7 +151,28 @@ CELERY_TIMEZONE = TIME_ZONE
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
+
+# Facebook / Instagram Graph API Configuration
+FACEBOOK_APP_ID = os.environ.get('FACEBOOK_APP_ID', '2152580995274159')
+FACEBOOK_APP_SECRET = os.environ.get('FACEBOOK_APP_SECRET', 'f15ecbdbdc0361f2f0679fee72a201cf')
+
+FACEBOOK_OAUTH_REDIRECT_URI = (
+    'https://clementine-unlegalized-nichole.ngrok-free.dev/'
+
+)
+
 # Instagram Configuration
-INSTAGRAM_APP_ID = os.environ.get('INSTAGRAM_APP_ID', '1218817627053632')
-INSTAGRAM_CLIENT_SECRET = os.environ.get('INSTAGRAM_CLIENT_SECRET', 'ac2407f73cb604f6b4ba6f27765d8629') # NOTE: You still need to update this with your actual App Secret
+INSTAGRAM_APP_ID = os.environ.get('INSTAGRAM_APP_ID', '1640423764050164')
+INSTAGRAM_CLIENT_SECRET = os.environ.get('INSTAGRAM_CLIENT_SECRET', 'ba98f80f287a12789caaeaf1d70ad490') # NOTE: You still need to update this with your actual App Secret
 INSTAGRAM_REDIRECT_URI = 'https://clementine-unlegalized-nichole.ngrok-free.dev/api/social-accounts/instagram_callback/'
+INSTAGRAM_ACCESS_TOKEN = '2152580995274159|YqnblhGVhYzTCs_BUR_FylwnJVM'
+META_WEBHOOK_VERIFY_TOKEN = os.environ.get(
+    "META_WEBHOOK_VERIFY_TOKEN",
+    "postless_webhook_verify_7fA9kL2026"
+)
+INSTAGRAM_VERIFY_TOKEN = 'IGAAXT9Ou8wPRBZAGF2RC1JVndKYW5aeEEzZAFJUU3BiRnJJY01HYXpRYXpEUFdpNV9ieG9EUXU4Y0tMVEU2QVZAYYWc0bWhHd1NpUEQwWUN0a2xsSm9Kd1M3S3J0UHM1QUtkVXRSWGVKNnlQaGZA6eVNDNF9PTnVVWkh6UUdNRDVkbwZDZD'
+
+# YouTube Configuration
+YOUTUBE_CLIENT_ID = os.environ.get('YOUTUBE_CLIENT_ID', '935602501203-vfpajcescc17kg3nbei7ck8nrulf33k7.apps.googleusercontent.com')
+YOUTUBE_CLIENT_SECRET = os.environ.get('YOUTUBE_CLIENT_SECRET', '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ß')
+YOUTUBE_REDIRECT_URI = 'https://clementine-unlegalized-nichole.ngrok-free.dev/api/social-accounts/youtube_callback/'
