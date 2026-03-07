@@ -34,6 +34,14 @@ CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:8000'
 ]
 
+# Session and Cookie Settings for Ngrok/HTTPS
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = 'None'
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -119,7 +127,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Istanbul'
 
 USE_I18N = True
 
@@ -130,12 +138,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+MEDIA_URL = '/uploads/'
+MEDIA_ROOT = BASE_DIR / 'uploads'
 
 AUTH_USER_MODEL = 'users.User'
 
 # Celery Configuration
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -156,9 +167,9 @@ FACEBOOK_OAUTH_REDIRECT_URI = (
 
 # Instagram Configuration
 INSTAGRAM_APP_ID = os.environ.get('INSTAGRAM_APP_ID', '1640423764050164')
-INSTAGRAM_CLIENT_SECRET = os.environ.get('INSTAGRAM_CLIENT_SECRET', 'ba98f80f287a12789caaeaf1d70ad490') # NOTE: You still need to update this with your actual App Secret
+INSTAGRAM_CLIENT_SECRET = os.environ.get('INSTAGRAM_CLIENT_SECRET', 'ba98f80f287a12789caaeaf1d70ad490')
 INSTAGRAM_REDIRECT_URI = 'https://clementine-unlegalized-nichole.ngrok-free.dev/api/social-accounts/instagram_callback/'
-INSTAGRAM_ACCESS_TOKEN = '2152580995274159|YqnblhGVhYzTCs_BUR_FylwnJVM'
+INSTAGRAM_ACCESS_TOKEN = 'IGAAXT9Ou8wPRBZAFpSdlVqcGNkSi1rM1ZAmeXRtRlZADVlE1Qm5leGE5ak1ab3M5SWptNGFKYTFJajZADeEJoMWEwazBhSHZAuODNLS1ZA5N0MwX0VodlVQQ2E5TEZA6a29LeU9IY1B2ME9hcGJzQWZAZALXRtZAllBX1Q0ZA0d1Vmx2aDFrNAZDZD'
 META_WEBHOOK_VERIFY_TOKEN = os.environ.get(
     "META_WEBHOOK_VERIFY_TOKEN",
     "postless_webhook_verify_7fA9kL2026"
@@ -170,10 +181,13 @@ YOUTUBE_CLIENT_ID = os.environ.get('YOUTUBE_CLIENT_ID', '935602501203-vfpajcescc
 YOUTUBE_CLIENT_SECRET = os.environ.get('YOUTUBE_CLIENT_SECRET', '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')
 YOUTUBE_REDIRECT_URI = 'https://clementine-unlegalized-nichole.ngrok-free.dev/api/social-accounts/youtube_callback/'
 
-# Session and Cookie Settings for Ngrok/HTTPS (CRITICAL)
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-SESSION_COOKIE_SECURE = True
-SESSION_COOKIE_SAMESITE = 'None'
-CSRF_COOKIE_SECURE = True
-CSRF_COOKIE_SAMESITE = 'None'
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# OpenAI Configuration
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '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')
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    "check-scheduled-posts-every-minute": {
+        "task": "scheduling.tasks.schedule_post_task",
+        "schedule": 60.0,  # her 60 saniye
+    },
+}
