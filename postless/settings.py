@@ -156,6 +156,8 @@ UPSTASH_REDIS_TOKEN = "AZPeAAIncDFhODRiYzBiOWMzNGU0MTY2OTVhOWY4YzliYTE0OTk5MnAxM
 # Celery Configuration (Using Upstash)
 # Upstash uses HTTP protocol, but for Celery we'll use it as a broker
 # format: rediss://:token@host:port?ssl_cert_reqs=none
+# Upstash uses HTTP protocol, but for Celery we'll use it as a broker
+# format: rediss://:token@host:port?ssl_cert_reqs=none
 CELERY_BROKER_URL = f"rediss://:{UPSTASH_REDIS_TOKEN}@amused-reptile-37854.upstash.io:6379?ssl_cert_reqs=none"
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 CELERY_ACCEPT_CONTENT = ['json']
