@@ -26,12 +26,11 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-vf*0g94mj7j_m$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['www.postless.solutions','postless.solutions']
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://clementine-unlegalized-nichole.ngrok-free.dev',
-    'http://localhost:8000',
-    'http://127.0.0.1:8000'
+    'https://postless.solutions',
+    'https://www.postless.solutions'
 ]
 
 # Session and Cookie Settings for Ngrok/HTTPS
