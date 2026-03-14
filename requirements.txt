@@ -4,6 +4,7 @@ celery
 redis
 upstash-redis
 psycopg2-binary
+dj-database-url
 stripe
 openai
 requests

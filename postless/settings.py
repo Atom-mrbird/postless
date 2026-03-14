@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 import os
 from pathlib import Path
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -100,12 +101,23 @@ IYZICO_CALLBACK_URL = 'https://www.postless.solutions/users/payment/callback/'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
@@ -153,12 +165,8 @@ AUTH_USER_MODEL = 'users.User'
 UPSTASH_REDIS_URL = "https://amused-reptile-37854.upstash.io"
 UPSTASH_REDIS_TOKEN = "AZPeAAIncDFhODRiYzBiOWMzNGU0MTY2OTVhOWY4YzliYTE0OTk5MnAxMzc4NTQ"
 
-# Celery Configuration (Using Upstash)
-# Upstash uses HTTP protocol, but for Celery we'll use it as a broker
-# format: rediss://:token@host:port?ssl_cert_reqs=none
-# Upstash uses HTTP protocol, but for Celery we'll use it as a broker
-# format: rediss://:token@host:port?ssl_cert_reqs=none
-CELERY_BROKER_URL = f"rediss://:{UPSTASH_REDIS_TOKEN}@amused-reptile-37854.upstash.io:6379?ssl_cert_reqs=none"
+# Celery Configuration (Using postless.solutions alias if configured, otherwise direct Upstash)
+CELERY_BROKER_URL = f"rediss://:{UPSTASH_REDIS_TOKEN}@postless.solutions:6379?ssl_cert_reqs=none"
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
