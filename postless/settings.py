@@ -27,7 +27,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-vf*0g94mj7j_m$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['www.postless.solutions','postless.solutions']
+ALLOWED_HOSTS = ['www.postless.solutions','postless.solutions', 'localhost', '127.0.0.1']
 
 CSRF_TRUSTED_ORIGINS = [
     'https://postless.solutions',
@@ -161,12 +161,13 @@ MEDIA_ROOT = BASE_DIR / 'uploads'
 
 AUTH_USER_MODEL = 'users.User'
 
-# Redis Configuration (Using maglev.proxy.rlwy.net)
-REDIS_URL = "redis://:AZPeAAIncDFhODRiYzBiOWMzNGU0MTY2OTVhOWY4YzliYTE0OTk5MnAxMzc4NTQ@maglev.proxy.rlwy.net:15718"
+# Upstash Redis Configuration
+UPSTASH_REDIS_TOKEN = "AZPeAAIncDFhODRiYzBiOWMzNGU0MTY2OTVhOWY4YzliYTE0OTk5MnAxMzc4NTQ"
+UPSTASH_REDIS_HOST = "amused-reptile-37854.upstash.io"
 
-# Celery Configuration
-CELERY_BROKER_URL = REDIS_URL
-CELERY_RESULT_BACKEND = REDIS_URL
+# Celery Configuration (Correct URL format for Upstash)
+CELERY_BROKER_URL = f"rediss://default:{UPSTASH_REDIS_TOKEN}@{UPSTASH_REDIS_HOST}:6379?ssl_cert_reqs=none"
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
