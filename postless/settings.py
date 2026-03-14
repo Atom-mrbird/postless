@@ -161,13 +161,12 @@ MEDIA_ROOT = BASE_DIR / 'uploads'
 
 AUTH_USER_MODEL = 'users.User'
 
-# Upstash Redis Configuration (Celery and Cache)
-UPSTASH_REDIS_URL = "https://amused-reptile-37854.upstash.io"
-UPSTASH_REDIS_TOKEN = "AZPeAAIncDFhODRiYzBiOWMzNGU0MTY2OTVhOWY4YzliYTE0OTk5MnAxMzc4NTQ"
+# Redis Configuration (Using maglev.proxy.rlwy.net)
+REDIS_URL = "redis://:AZPeAAIncDFhODRiYzBiOWMzNGU0MTY2OTVhOWY4YzliYTE0OTk5MnAxMzc4NTQ@maglev.proxy.rlwy.net:15718"
 
-# Celery Configuration (Using postless.solutions alias if configured, otherwise direct Upstash)
-CELERY_BROKER_URL = f"rediss://:{UPSTASH_REDIS_TOKEN}@postless.solutions:6379?ssl_cert_reqs=none"
-CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+# Celery Configuration
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
