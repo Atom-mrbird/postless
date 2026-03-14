@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up - Postless{% endblock %}
+
+{% block content %}
+<div class="min-h-[80vh] flex items-center justify-center">
+    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border border-gray-100">
+        <div class="text-center mb-8">
+            <h1 class="text-2xl font-bold text-gray-900">Create an Account</h1>
+            <p class="text-gray-500 mt-2">Start automating your content today.</p>
+        </div>
+
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+
+            {% for field in form %}
+            <div>
+                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                    {{ field.label }}
+                </label>
+                
+                {% if field.name == 'username' or field.name == 'password' or field.name == 'confirm_password' or 'pass' in field.name %}
+                    <input type="{{ field.field.widget.input_type }}" 
+                           name="{{ field.name }}" 
+                           id="{{ field.id_for_label }}"
+                           class="w-full rounded-lg border-gray-300 text-sm focus:ring-primary focus:border-primary"
+                           required>
+                {% else %}
+                    {{ field }}
+                {% endif %}
+
+                {% if field.help_text %}
+                <p class="mt-1 text-xs text-gray-500">{{ field.help_text|safe }}</p>
+                {% endif %}
+
+                {% if field.errors %}
+                <div class="mt-1 text-xs text-red-600">
+                    {{ field.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="w-full py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-indigo-600 transition-colors shadow-sm mt-4">
+                Sign Up
+            </button>
+        </form>
+
+        <div class="mt-6 text-center text-sm text-gray-600">
+            Already have an account? 
+            <a href="{% url 'login' %}" class="text-primary font-medium hover:underline">Log in</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

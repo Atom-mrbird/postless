@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Pricing - Postless{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-16 text-center">
+
+    {% if is_active %}
+        <h1 class="text-4xl font-extrabold text-gray-900 mb-4 dark:text-white">Her Şey Yolunda!</h1>
+        <p class="text-lg text-gray-600 mb-12 dark:text-gray-400">Şu anda Postless Pro abonesisiniz.</p>
+    {% elif is_trial %}
+        <h1 class="text-4xl font-extrabold text-gray-900 mb-4 dark:text-white">Ücretsiz Deneme Süresindesiniz</h1>
+        <p class="text-lg text-gray-600 mb-12 dark:text-gray-400">Deneme sürenizin bitmesine <span class="font-bold text-primary dark:text-indigo-400">{{ days_left }} gün</span> kaldı. Erişiminizi kaybetmemek için şimdi abone olun.</p>
+    {% else %}
+        <h1 class="text-4xl font-extrabold text-gray-900 mb-4 dark:text-white">Basit ve Şeffaf Fiyatlandırma</h1>
+        <p class="text-lg text-gray-600 mb-12 dark:text-gray-400">Yapay zeka ile içerik üretimine bugün başlayın.</p>
+    {% endif %}
+
+    <div class="relative bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden max-w-sm mx-auto dark:bg-gray-800 dark:border-gray-700">
+        {% if is_active %}
+        <div class="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">AKTİF</div>
+        {% else %}
+        <div class="absolute top-0 right-0 bg-primary text-white text-xs font-bold px-3 py-1 rounded-bl-lg">POPÜLER</div>
+        {% endif %}
+
+        <div class="p-8">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Postless Pro</h2>
+            <p class="text-gray-500 mt-2 dark:text-gray-400">İçeriğinizi otomatikleştirmek için ihtiyacınız olan her şey.</p>
+
+            <div class="my-8">
+                <span class="text-5xl font-extrabold text-gray-900 dark:text-white">₺500</span>
+                <span class="text-gray-500 dark:text-gray-400">/ay</span>
+            </div>
+
+            <ul class="text-left space-y-4 mb-8">
+                <li class="flex items-center text-gray-600 dark:text-gray-300">
+                    <i class="fa-solid fa-check text-green-500 mr-3"></i> Sınırsız Yapay Zeka Üretimi
+                </li>
+                <li class="flex items-center text-gray-600 dark:text-gray-300">
+                    <i class="fa-solid fa-check text-green-500 mr-3"></i> Instagram & YouTube Otomatik Paylaşım
+                </li>
+                <li class="flex items-center text-gray-600 dark:text-gray-300">
+                    <i class="fa-solid fa-check text-green-500 mr-3"></i> Gelişmiş Planlama Paneli
+                </li>
+                <li class="flex items-center text-gray-600 dark:text-gray-300">
+                    <i class="fa-solid fa-check text-green-500 mr-3"></i> Detaylı Analitik Takibi
+                </li>
+                <li class="flex items-center text-gray-600 dark:text-gray-300">
+                    <i class="fa-solid fa-check text-green-500 mr-3"></i> <strong>30 Günlük Ücretsiz Deneme</strong>
+                </li>
+            </ul>
+
+            {% if is_active %}
+                <div class="text-center p-4 bg-green-50 rounded-lg text-green-700 mb-4 dark:bg-green-900/30 dark:text-green-400">
+                    Aboneliğiniz aktif. Bir sonraki fatura tarihi: {{ request.user.subscription.current_period_end|date:"d F Y" }}.
+                </div>
+            {% elif is_trial %}
+                <div class="text-center p-4 bg-yellow-50 rounded-lg text-yellow-700 mb-4 dark:bg-yellow-900/30 dark:text-yellow-400">
+                    Ücretsiz deneme süreniz {{ subscription.trial_ends_at|date:"d F Y" }} tarihinde sona erecek.
+                </div>
+            {% endif %}
+
+            {% if is_active or is_trial %}
+                <div class="border-t border-gray-100 pt-6 mt-6 dark:border-gray-700">
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-gray-500 dark:text-gray-400">Durum:</span>
+                        <span class="font-bold {% if is_active %}text-green-600{% else %}text-yellow-600{% endif %}">
+                            {% if is_trial %}Ücretsiz Deneme{% else %}{{ subscription.status }}{% endif %}
+                        </span>
+                    </div>
+                    
+                    {% if is_active %}
+                        <p class="text-sm text-gray-500 dark:text-gray-400 italic">Aboneliğiniz yönetmek için destek ile iletişime geçin.</p>
+                    {% else %}
+                    <form action="{% url 'iyzico_payment_init' %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="block w-full text-center py-3 px-6 bg-primary hover:bg-indigo-600 text-white font-bold rounded-lg transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 dark:hover:bg-indigo-500">
+                            Şimdi Abone Ol
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            {% else %}
+                <form action="{% url 'iyzico_payment_init' %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="block w-full text-center py-3 px-6 bg-primary hover:bg-indigo-600 text-white font-bold rounded-lg transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 dark:hover:bg-indigo-500">
+                        30 Günlük Denemeyi Başlat
+                    </button>
+                </form>
+                <p class="text-xs text-gray-400 mt-4 dark:text-gray-500">Ardından ₺500/ay. İstediğiniz zaman iptal edin.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -4,7 +4,8 @@ from django.conf import settings
 class Content(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
+    description = models.TextField(blank=True, help_text="Generated Caption")
+    hashtags = models.TextField(blank=True, help_text="Generated Hashtags")
     file = models.FileField(upload_to='uploads/')
     content_type = models.CharField(max_length=20, choices=[('image', 'Image'), ('video', 'Video'), ('text', 'Text')], default='image')
     created_at = models.DateTimeField(auto_now_add=True)

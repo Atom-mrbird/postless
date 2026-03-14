@@ -18,9 +18,15 @@ app.autodiscover_tasks()
 
 # Define periodic tasks
 app.conf.beat_schedule = {
-    'check-and-publish-posts-every-minute': {
-        'task': 'scheduling.tasks.schedule_post_task',
-        'schedule': crontab(minute='*'), # Runs every minute
+    # Publisher Worker: Checks every minute for posts whose time has come
+    'publish-scheduled-posts-every-minute': {
+        'task': 'publishing.tasks.process_scheduled_posts',
+        'schedule': crontab(minute='*'), 
+    },
+    # Generator Worker: Checks every hour to see if active strategies need new content produced
+    'run-content-strategies-hourly': {
+        'task': 'ai_generation.tasks.run_content_strategies',
+        'schedule': crontab(minute='0'), # Runs at the top of every hour
     },
 }
 

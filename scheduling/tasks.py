@@ -8,12 +8,15 @@ import os
 from django.conf import settings
 import google.oauth2.credentials
 import googleapiclient.discovery
+import logging
+
+logger = logging.getLogger(__name__)
 
 @shared_task
 def schedule_post_task():
     """
     Checks for pending schedules and publishes them to the respective platforms.
-    Runs periodically (e.g., every 5 minutes).
+    Runs periodically (e.g., every minute) via Celery Beat.
     """
     now = timezone.now()
     # Find posts that are pending and scheduled for now or in the past
@@ -23,6 +26,8 @@ def schedule_post_task():
 
     for schedule in pending_schedules:
         try:
+            logger.info(f"Publishing schedule {schedule.id} for {schedule.platform}...")
+            
             if schedule.platform == 'Instagram':
                 result = publish_to_instagram(schedule)
             elif schedule.platform == 'YouTube':
@@ -35,7 +40,9 @@ def schedule_post_task():
         except Exception as e:
             schedule.status = 'failed'
             schedule.save()
-            results.append(f"Schedule {schedule.id} Failed: {str(e)}")
+            err_msg = f"Schedule {schedule.id} Failed: {str(e)}"
+            logger.error(err_msg)
+            results.append(err_msg)
 
     return results
 
@@ -45,12 +52,23 @@ def publish_to_instagram(schedule):
     Flow: Create Container -> Publish Container
     """
     try:
-        account = SocialAccount.objects.get(user=schedule.user, platform='Instagram')
-        access_token = account.access_token
-        ig_user_id = account.account_id
+        account = SocialAccount.objects.filter(user=schedule.user, platform='Instagram').first()
+        
+        access_token = getattr(settings, 'INSTAGRAM_ACCESS_TOKEN', None)
+        if not access_token and account:
+            access_token = account.access_token
+            
+        ig_user_id = getattr(settings, 'INSTAGRAM_ACCOUNT_ID', None)
+        if not ig_user_id and account:
+            ig_user_id = account.account_id
+            
+        if not access_token:
+            raise Exception("Instagram Access Token missing. Connect account.")
+        if not ig_user_id:
+            raise Exception("Instagram Account ID missing. Connect account.")
         
         # 1. Create Media Container
-        media_url = f"https://graph.facebook.com/v18.0/{ig_user_id}/media"
+        media_url = f"https://graph.facebook.com/v20.0/{ig_user_id}/media"
 
         # Determine media type
         is_video = schedule.content.file.name.lower().endswith(('.mp4', '.mov'))
@@ -60,12 +78,11 @@ def publish_to_instagram(schedule):
             'caption': schedule.content.description or schedule.content.title
         }
 
-        # Use ngrok URL for public access
-        base_url = settings.CSRF_TRUSTED_ORIGINS[0]
+        # Resolve public URL for the media
+        base_url = settings.CSRF_TRUSTED_ORIGINS[0] if getattr(settings, 'CSRF_TRUSTED_ORIGINS', None) else "http://localhost:8000"
         if not base_url.startswith('http'):
              base_url = f"https://{base_url}"
              
-        # Ensure MEDIA_URL is handled correctly
         if schedule.content.file.url.startswith('/'):
              file_url = f"{base_url}{schedule.content.file.url}"
         else:
@@ -77,21 +94,16 @@ def publish_to_instagram(schedule):
         else:
             params['image_url'] = file_url
 
-        print(f"DEBUG: Publishing to IG. URL: {file_url}, Token: {access_token[:10]}...")
-
         response = requests.post(media_url, params=params)
         data = response.json()
 
         if 'id' not in data:
-            # Token might be expired or invalid
-            if 'error' in data and data['error'].get('code') == 190:
-                 raise Exception(f"Token Expired/Invalid. Please reconnect Instagram account. Error: {data}")
             raise Exception(f"Container creation failed: {data}")
 
         creation_id = data['id']
 
         # 2. Publish Media
-        publish_url = f"https://graph.facebook.com/v18.0/{ig_user_id}/media_publish"
+        publish_url = f"https://graph.facebook.com/v20.0/{ig_user_id}/media_publish"
         publish_params = {
             'creation_id': creation_id,
             'access_token': access_token
@@ -142,7 +154,6 @@ def publish_to_youtube(schedule):
         }
 
         # File path (Local file upload)
-        # Note: In production with S3, you'd need to download the file first or use a stream
         file_path = schedule.content.file.path
 
         media = googleapiclient.http.MediaFileUpload(
@@ -161,7 +172,7 @@ def publish_to_youtube(schedule):
         while response is None:
             status, response = request.next_chunk()
             if status:
-                print(f"Uploaded {int(status.progress() * 100)}%")
+                logger.info(f"Uploaded {int(status.progress() * 100)}%")
 
         if 'id' in response:
             schedule.status = 'published'

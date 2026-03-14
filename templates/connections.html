@@ -6,53 +6,65 @@
 <div class="max-w-7xl mx-auto">
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">Connections</h1>
-            <p class="text-gray-500 mt-1">Manage your connected social media accounts and integrations.</p>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Connections</h1>
+            <p class="text-gray-500 mt-1 dark:text-gray-400">Manage your connected social media accounts and integrations.</p>
         </div>
-        <button class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-indigo-600 transition-colors shadow-sm">
+        <button class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-indigo-600 transition-colors shadow-sm dark:hover:bg-indigo-500">
             <i class="fa-solid fa-plus mr-2"></i> Add New Platform
         </button>
     </div>
 
+    <!-- Error/Warning Messages -->
+    {% if request.GET.error %}
+    <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg dark:bg-red-900/30 dark:border-red-800 dark:text-red-400">
+        <i class="fa-solid fa-circle-exclamation mr-2"></i> {{ request.GET.error }}
+    </div>
+    {% endif %}
+    {% if request.GET.warning %}
+    <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 text-yellow-700 rounded-lg dark:bg-yellow-900/30 dark:border-yellow-800 dark:text-yellow-400">
+        <i class="fa-solid fa-triangle-exclamation mr-2"></i> {{ request.GET.warning }}
+    </div>
+    {% endif %}
+
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Instagram Connection Card -->
-        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden dark:bg-gray-800 dark:border-gray-700">
             <div class="p-6">
                 <div class="flex items-start justify-between mb-4">
                     <div class="w-12 h-12 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 rounded-xl flex items-center justify-center text-white text-2xl shadow-sm">
                         <i class="fa-brands fa-instagram"></i>
                     </div>
                     {% if instagram_account %}
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
                         Connected
                     </span>
                     {% else %}
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
                         Not Connected
                     </span>
                     {% endif %}
                 </div>
-                <h3 class="text-lg font-bold text-gray-900">Instagram</h3>
-                <p class="text-sm text-gray-500 mt-1">Share photos, reels, and stories directly to your feed.</p>
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Instagram</h3>
+                <p class="text-sm text-gray-500 mt-1 dark:text-gray-400">Share photos, reels, and stories directly to your feed.</p>
 
-                <div class="mt-6 pt-6 border-t border-gray-100">
+                <div class="mt-6 pt-6 border-t border-gray-100 dark:border-gray-700">
                     {% if instagram_account %}
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="w-8 h-8 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center text-gray-400 text-xs font-bold">
+                        <div class="w-8 h-8 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center text-gray-400 text-xs font-bold dark:bg-gray-700">
                             {{ instagram_account.account_name|slice:":2"|upper }}
                         </div>
                         <div>
-                            <p class="text-sm font-medium text-gray-900">@{{ instagram_account.account_name }}</p>
-                            <p class="text-xs text-gray-500">Business Account</p>
+                            <p class="text-sm font-medium text-gray-900 dark:text-white">@{{ instagram_account.account_name }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Business Account</p>
                         </div>
                     </div>
                     <div class="flex gap-3">
-                        <button class="flex-1 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-                            Settings
-                        </button>
-                        <button class="px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors">
-                            Disconnect
-                        </button>
+                        <form method="POST" action="{% url 'disconnect_account' 'Instagram' %}" class="w-full" onsubmit="return confirm('Are you sure you want to disconnect Instagram?');">
+                            {% csrf_token %}
+                            <button type="submit" class="w-full px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50">
+                                Disconnect Account
+                            </button>
+                        </form>
                     </div>
                     {% else %}
                     <a href="/api/social-accounts/instagram_login/" class="w-full px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg text-sm font-medium hover:from-purple-700 hover:to-pink-700 transition-colors flex items-center justify-center gap-2">
@@ -64,47 +76,47 @@
         </div>
 
         <!-- YouTube Connection Card -->
-        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden dark:bg-gray-800 dark:border-gray-700">
             <div class="p-6">
                 <div class="flex items-start justify-between mb-4">
                     <div class="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center text-white text-2xl shadow-sm">
                         <i class="fa-brands fa-youtube"></i>
                     </div>
                     {% if youtube_account %}
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
                         Connected
                     </span>
                     {% else %}
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
                         Not Connected
                     </span>
                     {% endif %}
                 </div>
-                <h3 class="text-lg font-bold text-gray-900">YouTube</h3>
-                <p class="text-sm text-gray-500 mt-1">Upload long-form videos and Shorts to your channel.</p>
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">YouTube</h3>
+                <p class="text-sm text-gray-500 mt-1 dark:text-gray-400">Upload long-form videos and Shorts to your channel.</p>
 
-                <div class="mt-6 pt-6 border-t border-gray-100">
+                <div class="mt-6 pt-6 border-t border-gray-100 dark:border-gray-700">
                     {% if youtube_account %}
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="w-8 h-8 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center text-gray-400 text-xs font-bold">
+                        <div class="w-8 h-8 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center text-gray-400 text-xs font-bold dark:bg-gray-700">
                             {{ youtube_account.account_name|slice:":2"|upper }}
                         </div>
                         <div>
-                            <p class="text-sm font-medium text-gray-900">{{ youtube_account.account_name }}</p>
-                            <p class="text-xs text-gray-500">YouTube Channel</p>
+                            <p class="text-sm font-medium text-gray-900 dark:text-white">{{ youtube_account.account_name }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">YouTube Channel</p>
                         </div>
                     </div>
                     <div class="flex gap-3">
-                        <button class="flex-1 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-                            Settings
-                        </button>
-                        <button class="px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors">
-                            Disconnect
-                        </button>
+                        <form method="POST" action="{% url 'disconnect_account' 'YouTube' %}" class="w-full" onsubmit="return confirm('Are you sure you want to disconnect YouTube?');">
+                            {% csrf_token %}
+                            <button type="submit" class="w-full px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50">
+                                Disconnect Account
+                            </button>
+                        </form>
                     </div>
                     {% else %}
-                    <a href="/api/social-accounts/youtube_login/" class="w-full px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
-                        <i class="fa-brands fa-youtube"></i> Connect YouTube
+                    <a href="/api/social-accounts/youtube_login/" class="w-full px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 dark:bg-gray-700 dark:hover:bg-gray-600">
+                        <i class="fa-solid fa-link"></i> Connect YouTube
                     </a>
                     {% endif %}
                 </div>
@@ -112,13 +124,13 @@
         </div>
 
         <!-- TikTok (Coming Soon) -->
-        <div class="bg-gray-50 rounded-xl border border-gray-200 border-dashed p-6 flex flex-col items-center justify-center text-center opacity-75">
-            <div class="w-12 h-12 bg-gray-200 rounded-xl flex items-center justify-center text-gray-400 text-2xl mb-4">
+        <div class="bg-gray-50 rounded-xl border border-gray-200 border-dashed p-6 flex flex-col items-center justify-center text-center opacity-75 dark:bg-gray-800/50 dark:border-gray-700">
+            <div class="w-12 h-12 bg-gray-200 rounded-xl flex items-center justify-center text-gray-400 text-2xl mb-4 dark:bg-gray-700 dark:text-gray-500">
                 <i class="fa-brands fa-tiktok"></i>
             </div>
-            <h3 class="text-lg font-bold text-gray-900">TikTok</h3>
-            <p class="text-sm text-gray-500 mt-1">Short-form video scheduling coming soon.</p>
-            <button class="mt-4 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-400 cursor-not-allowed">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white">TikTok</h3>
+            <p class="text-sm text-gray-500 mt-1 dark:text-gray-400">Short-form video scheduling coming soon.</p>
+            <button class="mt-4 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:border-gray-700 dark:text-gray-500">
                 Notify Me
             </button>
         </div>

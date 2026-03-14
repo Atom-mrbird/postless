@@ -4,192 +4,149 @@
 
 {% block content %}
 <div class="max-w-7xl mx-auto">
-    <!-- Header Section -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
-            <p class="text-gray-500 mt-1">Welcome back! Here's what's happening with your content.</p>
-        </div>
-        <div class="flex gap-3">
-            <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-                <i class="fa-solid fa-filter mr-2"></i> Filter
-            </button>
-            <a href="/ai/" class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-indigo-600 transition-colors shadow-sm flex items-center gap-2">
-                <i class="fa-solid fa-plus"></i> Create New Post
-            </a>
-        </div>
+    <!-- Welcome Header -->
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Welcome back, {{ request.user.username }}! 👋</h1>
+        <p class="text-gray-500 mt-1 dark:text-gray-400">Here's what's happening with your content today.</p>
     </div>
 
     <!-- Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <!-- Stat Card 1 -->
-        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Scheduled Posts -->
+        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow dark:bg-gray-800 dark:border-gray-700">
             <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 bg-indigo-50 rounded-lg flex items-center justify-center text-primary">
-                    <i class="fa-solid fa-calendar-check text-xl"></i>
+                <div class="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center text-primary dark:bg-indigo-900/30">
+                    <i class="fa-solid fa-calendar-check text-lg"></i>
                 </div>
-                <span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">+12%</span>
+                <span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full dark:bg-green-900/30 dark:text-green-400">+5%</span>
             </div>
-            <h3 class="text-gray-500 text-sm font-medium">Scheduled Posts</h3>
-            <p class="text-2xl font-bold text-gray-900 mt-1">24</p>
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{ scheduled_count }}</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Scheduled Posts</p>
         </div>
 
-        <!-- Stat Card 2 -->
-        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+        <!-- Published Posts (Proxy for Reach) -->
+        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow dark:bg-gray-800 dark:border-gray-700">
             <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 bg-pink-50 rounded-lg flex items-center justify-center text-pink-500">
-                    <i class="fa-brands fa-instagram text-xl"></i>
+                <div class="w-10 h-10 bg-pink-50 rounded-lg flex items-center justify-center text-pink-600 dark:bg-pink-900/30 dark:text-pink-400">
+                    <i class="fa-solid fa-rocket text-lg"></i>
                 </div>
-                <span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">+5%</span>
+                <span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full dark:bg-green-900/30 dark:text-green-400">+12%</span>
             </div>
-            <h3 class="text-gray-500 text-sm font-medium">Instagram Reach</h3>
-            <p class="text-2xl font-bold text-gray-900 mt-1">12.5K</p>
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{ published_count }}</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Published Posts</p>
         </div>
 
-        <!-- Stat Card 3 -->
-        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+        <!-- Total Content (Proxy for Views) -->
+        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow dark:bg-gray-800 dark:border-gray-700">
             <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center text-red-500">
-                    <i class="fa-brands fa-youtube text-xl"></i>
+                <div class="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center text-red-600 dark:bg-red-900/30 dark:text-red-400">
+                    <i class="fa-solid fa-photo-film text-lg"></i>
                 </div>
-                <span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">+8%</span>
+                <span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full dark:bg-green-900/30 dark:text-green-400">+8%</span>
             </div>
-            <h3 class="text-gray-500 text-sm font-medium">YouTube Views</h3>
-            <p class="text-2xl font-bold text-gray-900 mt-1">45.2K</p>
-        </div>
-
-        <!-- Stat Card 4 -->
-        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-            <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center text-blue-500">
-                    <i class="fa-solid fa-robot text-xl"></i>
-                </div>
-                <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-full">Credits</span>
-            </div>
-            <h3 class="text-gray-500 text-sm font-medium">AI Credits Left</h3>
-            <p class="text-2xl font-bold text-gray-900 mt-1">850</p>
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{ total_contents }}</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Total Assets</p>
         </div>
     </div>
 
-    <!-- Main Content Grid -->
+    <!-- Main Content Area -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-        <!-- Upcoming Schedule (Left 2/3) -->
-        <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col">
-            <div class="p-6 border-b border-gray-100 flex items-center justify-between">
-                <h2 class="text-lg font-bold text-gray-900">Upcoming Schedule</h2>
-                <a href="/schedule/" class="text-sm text-primary font-medium hover:underline">View Calendar</a>
+        <!-- Upcoming Schedule -->
+        <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <div class="p-6 border-b border-gray-100 flex items-center justify-between dark:border-gray-700">
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white">Upcoming Schedule</h2>
+                <a href="/schedule/" class="text-sm font-medium text-primary hover:text-indigo-700 dark:hover:text-indigo-400">View Calendar</a>
             </div>
             <div class="p-6">
+                {% if upcoming_schedules %}
                 <div class="space-y-6">
-                    <!-- Schedule Item 1 -->
+                    {% for schedule in upcoming_schedules %}
                     <div class="flex gap-4 group">
-                        <div class="flex flex-col items-center min-w-[60px]">
-                            <span class="text-xs font-bold text-gray-400 uppercase">Today</span>
-                            <span class="text-xl font-bold text-gray-900">14:00</span>
+                        <div class="w-16 flex-shrink-0 text-center">
+                            <span class="block text-sm font-bold text-gray-900 dark:text-white">{{ schedule.scheduled_time|date:"H:i" }}</span>
+                            <span class="block text-xs text-gray-500 dark:text-gray-400">{{ schedule.scheduled_time|date:"M d" }}</span>
                         </div>
-                        <div class="flex-1 bg-gray-50 rounded-lg p-4 border border-gray-100 group-hover:border-indigo-200 transition-colors relative">
-                            <div class="absolute top-4 right-4">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                    Pending
-                                </span>
-                            </div>
-                            <div class="flex items-start gap-4">
-                                <div class="w-16 h-16 bg-gray-200 rounded-md overflow-hidden flex-shrink-0">
-                                    <img src="https://placehold.co/100x100" alt="Post thumbnail" class="w-full h-full object-cover">
-                                </div>
-                                <div>
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <i class="fa-brands fa-instagram text-pink-500"></i>
-                                        <h4 class="font-semibold text-gray-900">Summer Collection Launch</h4>
-                                    </div>
-                                    <p class="text-sm text-gray-500 line-clamp-2">Get ready for the hottest styles of the season! ☀️ Our new collection drops tomorrow. #summer #fashion</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                        <div class="relative flex-1 bg-gray-50 rounded-xl p-4 group-hover:bg-indigo-50/50 transition-colors border border-transparent group-hover:border-indigo-100 dark:bg-gray-700/50 dark:group-hover:bg-gray-700 dark:group-hover:border-gray-600">
+                            <!-- Timeline connector -->
+                            {% if not forloop.last %}
+                            <div class="absolute top-10 -left-6 w-0.5 h-full bg-gray-200 group-hover:bg-indigo-200 dark:bg-gray-600 dark:group-hover:bg-gray-500"></div>
+                            {% endif %}
+                            <!-- Status Dot -->
+                            <div class="absolute top-5 -left-[27px] w-3 h-3 rounded-full border-2 border-white {% if schedule.status == 'pending' %}bg-yellow-400{% else %}bg-green-500{% endif %} shadow-sm dark:border-gray-800"></div>
 
-                    <!-- Schedule Item 2 -->
-                    <div class="flex gap-4 group">
-                        <div class="flex flex-col items-center min-w-[60px]">
-                            <span class="text-xs font-bold text-gray-400 uppercase">Tomorrow</span>
-                            <span class="text-xl font-bold text-gray-900">09:00</span>
-                        </div>
-                        <div class="flex-1 bg-gray-50 rounded-lg p-4 border border-gray-100 group-hover:border-indigo-200 transition-colors relative">
-                            <div class="absolute top-4 right-4">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                    Scheduled
-                                </span>
-                            </div>
-                            <div class="flex items-start gap-4">
-                                <div class="w-16 h-16 bg-gray-200 rounded-md overflow-hidden flex-shrink-0">
-                                    <img src="https://placehold.co/100x100/333/fff" alt="Post thumbnail" class="w-full h-full object-cover">
+                            <div class="flex gap-4">
+                                {% if schedule.content.file %}
+                                <div class="w-16 h-16 rounded-lg bg-gray-200 flex-shrink-0 overflow-hidden dark:bg-gray-600">
+                                    {% if schedule.content.content_type == 'image' %}
+                                    <img src="{{ schedule.content.file.url }}" class="w-full h-full object-cover">
+                                    {% else %}
+                                    <video src="{{ schedule.content.file.url }}" class="w-full h-full object-cover"></video>
+                                    {% endif %}
                                 </div>
+                                {% endif %}
                                 <div>
                                     <div class="flex items-center gap-2 mb-1">
-                                        <i class="fa-brands fa-youtube text-red-500"></i>
-                                        <h4 class="font-semibold text-gray-900">Tech Review: New Gadgets</h4>
+                                        <span class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ schedule.platform }}</span>
+                                        <span class="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-500"></span>
+                                        <span class="text-xs text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full dark:bg-yellow-900/30 dark:text-yellow-400">{{ schedule.status|title }}</span>
                                     </div>
-                                    <p class="text-sm text-gray-500 line-clamp-2">Unboxing the latest tech gadgets for 2024. Is it worth the hype? Watch the full review.</p>
+                                    <h3 class="font-bold text-gray-900 text-sm mb-1 dark:text-white">{{ schedule.content.title }}</h3>
+                                    <p class="text-xs text-gray-500 line-clamp-2 dark:text-gray-400">{{ schedule.content.description }}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
+                {% else %}
+                <div class="text-center py-12 text-gray-400 dark:text-gray-500">
+                    <i class="fa-regular fa-calendar-xmark text-4xl mb-3"></i>
+                    <p>No upcoming posts scheduled.</p>
+                    <a href="/ai/" class="mt-2 inline-block text-sm text-primary hover:underline">Create with AI</a>
+                </div>
+                {% endif %}
             </div>
         </div>
 
-        <!-- Recent Activity / Quick Actions (Right 1/3) -->
+        <!-- Right Column -->
         <div class="space-y-8">
-            <!-- Quick AI Generation -->
-            <div class="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl p-6 text-white shadow-lg">
-                <h3 class="text-lg font-bold mb-2"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Quick Generate</h3>
-                <p class="text-indigo-100 text-sm mb-4">Create a new post instantly with AI.</p>
-                <form action="#" class="space-y-3">
-                    <input type="text" placeholder="What should the post be about?" class="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 placeholder-indigo-200 text-white focus:outline-none focus:bg-white/20 text-sm">
-                    <div class="flex gap-2">
-                        <select class="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white focus:outline-none">
-                            <option class="text-gray-900">Instagram</option>
-                            <option class="text-gray-900">YouTube</option>
-                        </select>
-                        <button type="button" class="flex-1 bg-white text-primary font-semibold py-2 rounded-lg text-sm hover:bg-indigo-50 transition-colors">
-                            Generate
-                        </button>
-                    </div>
-                </form>
+            <!-- Quick Action -->
+            <div class="bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl shadow-lg p-6 text-white relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+                <div class="relative z-10">
+                    <h2 class="text-lg font-bold mb-2">Quick Generate</h2>
+                    <p class="text-indigo-100 text-sm mb-6">Create a new post instantly with AI.</p>
+                    <a href="/ai/" class="w-full bg-white text-primary font-bold py-2.5 rounded-lg shadow-sm hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate
+                    </a>
+                </div>
             </div>
 
-            <!-- Recent Logs -->
-            <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
-                <div class="p-4 border-b border-gray-100">
-                    <h3 class="font-bold text-gray-900">Recent Activity</h3>
+            <!-- Recent Activity -->
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+                <div class="p-6 border-b border-gray-100 dark:border-gray-700">
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">Recent Activity</h2>
                 </div>
-                <div class="divide-y divide-gray-100">
-                    <div class="p-4 flex gap-3 items-start">
-                        <div class="mt-1 w-2 h-2 rounded-full bg-green-500"></div>
-                        <div>
-                            <p class="text-sm text-gray-800">Post published successfully</p>
-                            <p class="text-xs text-gray-500 mt-0.5">Instagram • 2 hours ago</p>
+                <div class="p-6">
+                    <div class="space-y-6">
+                        {% for activity in activities %}
+                        <div class="flex gap-4">
+                            <div class="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center
+                                {% if activity.type == 'upload' %}bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400{% else %}bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400{% endif %}">
+                                <i class="fa-solid {% if activity.type == 'upload' %}fa-cloud-arrow-up{% else %}fa-check{% endif %} text-xs"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ activity.title }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ activity.detail }} • {{ activity.time|timesince }} ago</p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="p-4 flex gap-3 items-start">
-                        <div class="mt-1 w-2 h-2 rounded-full bg-blue-500"></div>
-                        <div>
-                            <p class="text-sm text-gray-800">New media uploaded</p>
-                            <p class="text-xs text-gray-500 mt-0.5">Library • 5 hours ago</p>
-                        </div>
-                    </div>
-                    <div class="p-4 flex gap-3 items-start">
-                        <div class="mt-1 w-2 h-2 rounded-full bg-yellow-500"></div>
-                        <div>
-                            <p class="text-sm text-gray-800">AI Generation completed</p>
-                            <p class="text-xs text-gray-500 mt-0.5">AI Tool • Yesterday</p>
-                        </div>
+                        {% empty %}
+                        <p class="text-sm text-gray-400 text-center dark:text-gray-500">No recent activity.</p>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 {% endblock %}

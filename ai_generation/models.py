@@ -4,9 +4,37 @@ from django.conf import settings
 class AIPrompt(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     prompt_text = models.TextField()
-    generated_content = models.TextField(blank=True)
-    prompt_type = models.CharField(max_length=20, choices=[('image', 'Image'), ('text', 'Text')], default='text')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.prompt_text[:20]}"
+
+class ContentStrategy(models.Model):
+    FREQUENCY_CHOICES = [
+        ('daily', 'Daily'),
+        ('weekly', 'Weekly'),
+    ]
+    
+    PLATFORM_CHOICES = [
+        ('Instagram', 'Instagram'),
+        ('YouTube', 'YouTube'),
+    ]
+    
+    CONTENT_TYPE_CHOICES = [
+        ('image', 'Image (DALL-E 3)'),
+        ('video', 'Video (Sora)'),
+    ]
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    title = models.CharField(max_length=100, help_text="Strategy Name (e.g., Daily Cat Facts)")
+    concept_prompt = models.TextField(help_text="The core concept for AI generation")
+    platform = models.CharField(max_length=20, choices=PLATFORM_CHOICES)
+    content_type = models.CharField(max_length=10, choices=CONTENT_TYPE_CHOICES, default='image')
+    frequency = models.CharField(max_length=10, choices=FREQUENCY_CHOICES, default='daily')
+    time_of_day = models.TimeField(help_text="Preferred time to post")
+    is_active = models.BooleanField(default=True)
+    last_run_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Prompt by {self.user.username} at {self.created_at}"
+        return f"{self.title} ({self.get_frequency_display()})"

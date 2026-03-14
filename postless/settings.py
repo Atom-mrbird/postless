@@ -92,6 +92,12 @@ WSGI_APPLICATION = 'postless.wsgi.application'
 ASGI_APPLICATION = 'postless.asgi.application'
 
 
+# Iyzico Settings
+IYZICO_API_KEY = os.environ.get('IYZICO_API_KEY', 'sandbox-A51P519o6I1L9q5y2Q0A5Y7V6X4J8u3w')
+IYZICO_SECRET_KEY = os.environ.get('IYZICO_SECRET_KEY', 'sandbox-S6v0L2J5q7V4w1O9n3B8M5X2U1G4k6e')
+IYZICO_BASE_URL = os.environ.get('IYZICO_BASE_URL', 'https://sandbox-api.iyzipay.com')
+IYZICO_CALLBACK_URL = 'https://clementine-unlegalized-nichole.ngrok-free.dev/users/payment/callback/'
+
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
@@ -144,9 +150,15 @@ MEDIA_ROOT = BASE_DIR / 'uploads'
 
 AUTH_USER_MODEL = 'users.User'
 
-# Celery Configuration
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
-CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/0'
+# Upstash Redis Configuration (Celery and Cache)
+UPSTASH_REDIS_URL = "https://amused-reptile-37854.upstash.io"
+UPSTASH_REDIS_TOKEN = "AZPeAAIncDFhODRiYzBiOWMzNGU0MTY2OTVhOWY4YzliYTE0OTk5MnAxMzc4NTQ"
+
+# Celery Configuration (Using Upstash)
+# Upstash uses HTTP protocol, but for Celery we'll use it as a broker
+# format: rediss://:token@host:port?ssl_cert_reqs=none
+CELERY_BROKER_URL = f"rediss://:{UPSTASH_REDIS_TOKEN}@amused-reptile-37854.upstash.io:6379?ssl_cert_reqs=none"
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -157,24 +169,22 @@ LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 
 # Facebook / Instagram Graph API Configuration
-FACEBOOK_APP_ID = os.environ.get('FACEBOOK_APP_ID', '2152580995274159')
-FACEBOOK_APP_SECRET = os.environ.get('FACEBOOK_APP_SECRET', 'f15ecbdbdc0361f2f0679fee72a201cf')
+FACEBOOK_APP_ID = os.environ.get('FACEBOOK_APP_ID', '5252245341667289')
+FACEBOOK_APP_SECRET = os.environ.get('FACEBOOK_APP_SECRET', '63af153f0b1d4ca16f8c5ef2765e5d62')
 
-FACEBOOK_OAUTH_REDIRECT_URI = (
-    'https://clementine-unlegalized-nichole.ngrok-free.dev/'
-
-)
+# Bu değişken kodda kullanılmıyor olabilir, ancak tutarlılık için callback adresiyle aynı olması önerilir
+FACEBOOK_OAUTH_REDIRECT_URI = 'https://clementine-unlegalized-nichole.ngrok-free.dev/api/social-accounts/instagram_callback/'
 
 # Instagram Configuration
-INSTAGRAM_APP_ID = os.environ.get('INSTAGRAM_APP_ID', '1640423764050164')
-INSTAGRAM_CLIENT_SECRET = os.environ.get('INSTAGRAM_CLIENT_SECRET', 'ba98f80f287a12789caaeaf1d70ad490')
+INSTAGRAM_APP_ID = '1640423764050164'
+INSTAGRAM_CLIENT_SECRET = 'ba98f80f287a12789caaeaf1d70ad490'
 INSTAGRAM_REDIRECT_URI = 'https://clementine-unlegalized-nichole.ngrok-free.dev/api/social-accounts/instagram_callback/'
-INSTAGRAM_ACCESS_TOKEN = 'IGAAXT9Ou8wPRBZAFpSdlVqcGNkSi1rM1ZAmeXRtRlZADVlE1Qm5leGE5ak1ab3M5SWptNGFKYTFJajZADeEJoMWEwazBhSHZAuODNLS1ZA5N0MwX0VodlVQQ2E5TEZA6a29LeU9IY1B2ME9hcGJzQWZAZALXRtZAllBX1Q0ZA0d1Vmx2aDFrNAZDZD'
+INSTAGRAM_ACCESS_TOKEN = 'EABKo46ncZC9kBQ82nC4Va0NwXMgpVLCC4ZAQTDJ734UFUEm2OkmOKM3t84MrV9baG81JNpT27zHZCcOHL9teZApEE4r6dWslHYzEUZCb0WgNc8viBZBYZBZCA6FBIv97V1CMZCiNfhZCiyfw2M7PKHeejIC8QaFHVKNZCvuNDDSNQPJHHELtZAgZBZB78wX2JM97Pghn4fqld0NPBfjZBHlZAQZDZD'
+INSTAGRAM_ACCOUNT_ID = '17841480699522650'
 META_WEBHOOK_VERIFY_TOKEN = os.environ.get(
     "META_WEBHOOK_VERIFY_TOKEN",
     "postless_webhook_verify_7fA9kL2026"
 )
-INSTAGRAM_VERIFY_TOKEN = 'IGAAXT9Ou8wPRBZAGF2RC1JVndKYW5aeEEzZAFJUU3BiRnJJY01HYXpRYXpEUFdpNV9ieG9EUXU4Y0tMVEU2QVZAYYWc0bWhHd1NpUEQwWUN0a2xsSm9Kd1M3S3J0UHM1QUtkVXRSWGVKNnlQaGZA6eVNDNF9PTnVVWkh6UUdNRDVkbwZDZD'
 
 # YouTube Configuration
 YOUTUBE_CLIENT_ID = os.environ.get('YOUTUBE_CLIENT_ID', '935602501203-vfpajcescc17kg3nbei7ck8nrulf33k7.apps.googleusercontent.com')
@@ -183,11 +193,28 @@ YOUTUBE_REDIRECT_URI = 'https://clementine-unlegalized-nichole.ngrok-free.dev/ap
 
 # OpenAI Configuration
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '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')
-from celery.schedules import crontab
 
+# RunwayML Configuration
+RUNWAYML_API_KEY = os.environ.get('RUNWAYML_API_KEY', 'key_76eb6d620d1a890cd99712eeae233911dbea878d437209e19735b6b6863f1bfd75d3b1e1d83f26ccd4e18163b49be6abef4d8c1b1803687316104d3f2d4d2934')
+
+# Celery Beat Schedule
+from celery.schedules import crontab
 CELERY_BEAT_SCHEDULE = {
     "check-scheduled-posts-every-minute": {
-        "task": "scheduling.tasks.schedule_post_task",
-        "schedule": 60.0,  # her 60 saniye
+        "task": "publishing.tasks.process_scheduled_posts",
+        "schedule": 60.0,
+    },
+    "run-content-strategies-every-hour": {
+        "task": "ai_generation.tasks.run_content_strategies",
+        "schedule": crontab(minute=0), # Every hour
     },
 }
+
+# Email Configuration (Gmail SMTP)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'ataberk@postless.solutions'
+EMAIL_HOST_PASSWORD = 'gkkznhmlhtndpknd'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

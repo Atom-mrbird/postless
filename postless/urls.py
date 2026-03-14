@@ -1,39 +1,47 @@
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from users.views import UserViewSet, SocialAccountViewSet, connections_page, instagram_webhook
-from content.views import ContentViewSet
-from ai_generation.views import AIPromptViewSet, ai_generator_page, generate_content, save_generated_content
-from scheduling.views import ScheduleViewSet, schedule_page
-from analytics.views import AnalyticsDataViewSet
-from django.views.generic import TemplateView
 from django.conf import settings
 from django.conf.urls.static import static
-
-router = DefaultRouter()
-router.register(r'users', UserViewSet)
-router.register(r'social-accounts', SocialAccountViewSet)
-router.register(r'content', ContentViewSet)
-router.register(r'ai-prompts', AIPromptViewSet)
-router.register(r'schedules', ScheduleViewSet)
-router.register(r'analytics', AnalyticsDataViewSet)
+from content.views import content_page, dashboard_view
+from scheduling.views import schedule_page, edit_schedule
+from users.views import connections_page, disconnect_account, settings_page, pricing_page, iyzico_payment_init, iyzico_payment_callback, instagram_webhook
+from ai_generation.views import ai_generator_page, automation_page, delete_strategy, run_strategy_now, generate_content, save_generated_content
+from django.views.generic import TemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),
-    path('api/webhooks/instagram/', instagram_webhook, name='instagram_webhook'),
+    path('api/', include('users.urls')),
+    
+    # UI Routes
+    path('', dashboard_view, name='dashboard'),
+    path('schedule/', schedule_page, name='schedule'),
+    path('schedule/edit/<int:id>/', edit_schedule, name='edit_schedule'),
+    path('content/', content_page, name='content'),
+    path('connections/', connections_page, name='connections'),
+    path('connections/disconnect/<str:platform>/', disconnect_account, name='disconnect_account'),
+    path('settings/', settings_page, name='settings'),
+    path('pricing/', pricing_page, name='pricing'),
+    path('ai/', ai_generator_page, name='ai_generator'),
+    path('automation/', automation_page, name='automation'),
+    path('automation/delete/<int:id>/', delete_strategy, name='delete_strategy'),
+    path('automation/run/<int:id>/', run_strategy_now, name='run_strategy_now'),
+    
+    # AI API Routes
     path('api/generate-content/', generate_content, name='generate_content'),
     path('api/save-generated-content/', save_generated_content, name='save_generated_content'),
+    
+    # Iyzico Routes
+    path('users/payment/init/', iyzico_payment_init, name='iyzico_payment_init'),
+    path('users/payment/callback/', iyzico_payment_callback, name='iyzico_payment_callback'),
+
+    # Meta/Instagram Webhook
+    path('webhooks/instagram/', instagram_webhook, name='instagram_webhook'),
+
+    # Auth
     path('accounts/', include('django.contrib.auth.urls')),
-    path('', TemplateView.as_view(template_name='dashboard.html'), name='dashboard'),
-    path('schedule/', schedule_page, name='schedule'),
-    path('content/', TemplateView.as_view(template_name='content.html'), name='content'),
-    path('ai/', ai_generator_page, name='ai_generator'),
-    path('analytics/', TemplateView.as_view(template_name='analytics.html'), name='analytics'),
-    path('connections/', connections_page, name='connections'),
+    
     path('privacy-policy/', TemplateView.as_view(template_name='privacy_policy.html'), name='privacy_policy'),
 ]
 
-# Serve media files in development
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -9,7 +9,7 @@
     {% if messages %}
     <div class="mb-6">
         {% for message in messages %}
-        <div class="p-4 rounded-lg {% if message.tags == 'success' %}bg-green-50 text-green-700{% else %}bg-red-50 text-red-700{% endif %}">
+        <div class="p-4 rounded-lg {% if message.tags == 'success' %}bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400{% else %}bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400{% endif %}">
             {{ message }}
         </div>
         {% endfor %}
@@ -18,25 +18,25 @@
 
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">Content Schedule</h1>
-            <p class="text-gray-500 mt-1">Manage your upcoming posts and automation timeline.</p>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Content Schedule</h1>
+            <p class="text-gray-500 mt-1 dark:text-gray-400">Manage your upcoming posts and automation timeline.</p>
         </div>
         <div class="flex gap-3">
-            <div class="flex bg-white rounded-lg border border-gray-300 p-1">
-                <button class="px-3 py-1.5 bg-gray-100 text-gray-900 rounded-md text-sm font-medium shadow-sm">List View</button>
-                <button class="px-3 py-1.5 text-gray-600 hover:bg-gray-50 rounded-md text-sm font-medium">Calendar</button>
+            <div class="flex bg-white rounded-lg border border-gray-300 p-1 dark:bg-gray-800 dark:border-gray-700">
+                <button id="listViewBtn" onclick="switchView('list')" class="px-3 py-1.5 bg-gray-100 text-gray-900 rounded-md text-sm font-medium shadow-sm transition-all dark:bg-gray-700 dark:text-white">List View</button>
+                <button id="calendarViewBtn" onclick="switchView('calendar')" class="px-3 py-1.5 text-gray-600 hover:bg-gray-50 rounded-md text-sm font-medium transition-all dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300">Calendar</button>
             </div>
-            <button onclick="openScheduleModal()" class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-indigo-600 transition-colors shadow-sm">
+            <button onclick="openScheduleModal()" class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-indigo-600 transition-colors shadow-sm dark:hover:bg-indigo-500">
                 <i class="fa-solid fa-plus mr-2"></i> Add to Queue
             </button>
         </div>
     </div>
 
     <!-- Schedule List -->
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+    <div id="listView" class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden dark:bg-gray-800 dark:border-gray-700">
         <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left text-gray-500">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-200">
+            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600">
                     <tr>
                         <th scope="col" class="px-6 py-3">Content</th>
                         <th scope="col" class="px-6 py-3">Platform</th>
@@ -47,14 +47,14 @@
                 </thead>
                 <tbody>
                     {% for schedule in schedules %}
-                    <tr class="bg-white border-b border-gray-100 hover:bg-gray-50">
-                        <td class="px-6 py-4 font-medium text-gray-900 flex items-center gap-3">
+                    <tr class="bg-white border-b border-gray-100 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700/50">
+                        <td class="px-6 py-4 font-medium text-gray-900 flex items-center gap-3 dark:text-white">
                             {% if schedule.content.file %}
-                            <div class="w-10 h-10 rounded bg-gray-200 overflow-hidden">
-                                <img src="{{ schedule.content.file.url }} '/'%}" class="w-full h-full object-cover">
+                            <div class="w-10 h-10 rounded bg-gray-200 overflow-hidden dark:bg-gray-600">
+                                <img src="{{ schedule.content.file.url }}" class="w-full h-full object-cover">
                             </div>
                             {% else %}
-                            <div class="w-10 h-10 rounded bg-gray-100 flex items-center justify-center text-gray-400">
+                            <div class="w-10 h-10 rounded bg-gray-100 flex items-center justify-center text-gray-400 dark:bg-gray-700 dark:text-gray-500">
                                 <i class="fa-solid fa-file-lines"></i>
                             </div>
                             {% endif %}
@@ -62,11 +62,11 @@
                         </td>
                         <td class="px-6 py-4">
                             {% if schedule.platform == 'Instagram' %}
-                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-pink-50 text-pink-700">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-pink-50 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400">
                                     <i class="fa-brands fa-instagram"></i> Instagram
                                 </span>
                             {% elif schedule.platform == 'YouTube' %}
-                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400">
                                     <i class="fa-brands fa-youtube"></i> YouTube
                                 </span>
                             {% endif %}
@@ -76,20 +76,22 @@
                         </td>
                         <td class="px-6 py-4">
                             {% if schedule.status == 'pending' %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">Pending</span>
                             {% elif schedule.status == 'published' %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Published</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">Published</span>
                             {% else %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Failed</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">Failed</span>
                             {% endif %}
                         </td>
                         <td class="px-6 py-4 text-right">
-                            <button class="text-gray-400 hover:text-primary"><i class="fa-solid fa-pen"></i></button>
+                            <a href="{% url 'edit_schedule' schedule.id %}" class="text-gray-400 hover:text-primary dark:hover:text-indigo-400 transition-colors" title="Edit Schedule">
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="5" class="px-6 py-12 text-center text-gray-400">
+                        <td colspan="5" class="px-6 py-12 text-center text-gray-400 dark:text-gray-500">
                             <i class="fa-solid fa-calendar-xmark text-4xl mb-3"></i>
                             <p>No posts scheduled yet.</p>
                         </td>
@@ -99,14 +101,20 @@
             </table>
         </div>
     </div>
+
+    <!-- Calendar View -->
+    <div id="calendarView" class="hidden bg-white rounded-xl border border-gray-200 shadow-sm p-6 dark:bg-gray-800 dark:border-gray-700">
+        <div id="calendar"></div>
+    </div>
+
 </div>
 
 <!-- Add Schedule Modal -->
 <div id="scheduleModal" class="hidden fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-            <h3 class="font-bold text-gray-900">Schedule New Post</h3>
-            <button onclick="document.getElementById('scheduleModal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden dark:bg-gray-800 dark:border dark:border-gray-700">
+        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white">Schedule New Post</h3>
+            <button onclick="document.getElementById('scheduleModal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -116,24 +124,24 @@
 
             <!-- Content Selection -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Select Content</label>
-                <select name="content_id" id="contentSelect" required class="w-full rounded-lg border-gray-300 text-sm focus:ring-primary focus:border-primary">
+                <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Select Content</label>
+                <select name="content_id" id="contentSelect" required class="w-full rounded-lg border-gray-300 text-sm focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500">
                     <option value="">-- Choose from Library --</option>
                     {% for content in contents %}
                     <option value="{{ content.id }}">{{ content.title }} ({{ content.content_type }})</option>
                     {% endfor %}
                 </select>
-                <p class="text-xs text-gray-500 mt-1">Don't see your content? <a href="/content/" class="text-primary hover:underline">Upload here</a>.</p>
+                <p class="text-xs text-gray-500 mt-1 dark:text-gray-400">Don't see your content? <a href="/content/" class="text-primary hover:underline dark:text-indigo-400">Upload here</a>.</p>
             </div>
 
             <!-- Platform Selection -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Platform</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Platform</label>
                 <div class="grid grid-cols-2 gap-3">
                     {% if 'Instagram' in platforms %}
                     <label class="cursor-pointer">
                         <input type="radio" name="platform" value="Instagram" class="peer sr-only" required>
-                        <div class="p-3 border border-gray-200 rounded-lg peer-checked:border-pink-500 peer-checked:bg-pink-50 flex items-center justify-center gap-2 text-gray-600 peer-checked:text-pink-700 transition-all">
+                        <div class="p-3 border border-gray-200 rounded-lg peer-checked:border-pink-500 peer-checked:bg-pink-50 flex items-center justify-center gap-2 text-gray-600 peer-checked:text-pink-700 transition-all dark:border-gray-600 dark:text-gray-400 dark:peer-checked:bg-pink-900/20 dark:peer-checked:border-pink-500 dark:peer-checked:text-pink-400">
                             <i class="fa-brands fa-instagram"></i> Instagram
                         </div>
                     </label>
@@ -142,31 +150,31 @@
                     {% if 'YouTube' in platforms %}
                     <label class="cursor-pointer">
                         <input type="radio" name="platform" value="YouTube" class="peer sr-only" required>
-                        <div class="p-3 border border-gray-200 rounded-lg peer-checked:border-red-500 peer-checked:bg-red-50 flex items-center justify-center gap-2 text-gray-600 peer-checked:text-red-700 transition-all">
+                        <div class="p-3 border border-gray-200 rounded-lg peer-checked:border-red-500 peer-checked:bg-red-50 flex items-center justify-center gap-2 text-gray-600 peer-checked:text-red-700 transition-all dark:border-gray-600 dark:text-gray-400 dark:peer-checked:bg-red-900/20 dark:peer-checked:border-red-500 dark:peer-checked:text-red-400">
                             <i class="fa-brands fa-youtube"></i> YouTube
                         </div>
                     </label>
                     {% endif %}
                 </div>
                 {% if not platforms %}
-                <p class="text-xs text-red-500 mt-1"><i class="fa-solid fa-circle-exclamation"></i> No accounts connected. <a href="/connections/" class="underline">Connect now</a>.</p>
+                <p class="text-xs text-red-500 mt-1 dark:text-red-400"><i class="fa-solid fa-circle-exclamation"></i> No accounts connected. <a href="/connections/" class="underline">Connect now</a>.</p>
                 {% endif %}
             </div>
 
             <!-- Date & Time -->
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
-                    <input type="date" name="date" required min="{{ today|date:'Y-m-d' }}" class="w-full rounded-lg border-gray-300 text-sm focus:ring-primary focus:border-primary">
+                    <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Date</label>
+                    <input type="date" name="date" required min="{{ today|date:'Y-m-d' }}" class="w-full rounded-lg border-gray-300 text-sm focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500 [color-scheme:light] dark:[color-scheme:dark]">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Time</label>
-                    <input type="time" name="time" required class="w-full rounded-lg border-gray-300 text-sm focus:ring-primary focus:border-primary">
+                    <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Time</label>
+                    <input type="time" name="time" required class="w-full rounded-lg border-gray-300 text-sm focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500 [color-scheme:light] dark:[color-scheme:dark]">
                 </div>
             </div>
 
             <div class="pt-4">
-                <button type="submit" class="w-full py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-indigo-600 transition-colors shadow-sm">
+                <button type="submit" class="w-full py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-indigo-600 transition-colors shadow-sm dark:hover:bg-indigo-500">
                     Schedule Post
                 </button>
             </div>
@@ -174,7 +182,114 @@
     </div>
 </div>
 
+<!-- FullCalendar CDN -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+
+<style>
+    /* FullCalendar Dark Mode Fixes */
+    .dark .fc-theme-standard td, .dark .fc-theme-standard th {
+        border-color: #374151; /* gray-700 */
+    }
+    .dark .fc-scrollgrid {
+        border-color: #374151;
+    }
+    .dark .fc-col-header-cell-cushion, .dark .fc-daygrid-day-number {
+        color: #e5e7eb; /* gray-200 */
+    }
+    .dark .fc .fc-button-primary {
+        background-color: #374151;
+        border-color: #4b5563;
+        color: #e5e7eb;
+    }
+    .dark .fc .fc-button-primary:not(:disabled):active,
+    .dark .fc .fc-button-primary:not(:disabled).fc-button-active {
+        background-color: #4b5563;
+        border-color: #6b7280;
+    }
+</style>
+
 <script>
+    let calendar; // Calendar instance
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        
+        // Parse schedules from Django context
+        var events = [
+            {% for schedule in schedules %}
+            {
+                title: "{{ schedule.content.title|escapejs }}",
+                start: "{{ schedule.scheduled_time|date:'Y-m-d\TH:i:s' }}",
+                extendedProps: {
+                    platform: "{{ schedule.platform }}",
+                    status: "{{ schedule.status }}"
+                },
+                backgroundColor: "{% if schedule.platform == 'Instagram' %}#ec4899{% elif schedule.platform == 'YouTube' %}#ef4444{% else %}#6366f1{% endif %}",
+                borderColor: "{% if schedule.platform == 'Instagram' %}#ec4899{% elif schedule.platform == 'YouTube' %}#ef4444{% else %}#6366f1{% endif %}",
+                url: "{% url 'edit_schedule' schedule.id %}"
+            },
+            {% endfor %}
+        ];
+
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            events: events,
+            eventClick: function(info) {
+                // If there's a URL, let it navigate (default behavior)
+                // We're already setting url in the event object above
+            },
+            height: 'auto',
+            contentHeight: 600,
+        });
+    });
+
+    function switchView(viewName) {
+        const listView = document.getElementById('listView');
+        const calendarView = document.getElementById('calendarView');
+        const listBtn = document.getElementById('listViewBtn');
+        const calendarBtn = document.getElementById('calendarViewBtn');
+
+        const isDark = document.documentElement.classList.contains('dark');
+
+        // Active/Inactive Button Classes
+        const activeClassesLight = ['bg-gray-100', 'text-gray-900', 'shadow-sm'];
+        const inactiveClassesLight = ['text-gray-600', 'hover:bg-gray-50'];
+
+        const activeClassesDark = ['dark:bg-gray-700', 'dark:text-white'];
+        const inactiveClassesDark = ['dark:text-gray-400', 'dark:hover:bg-gray-700', 'dark:hover:text-gray-300'];
+
+        const activeClasses = [...activeClassesLight, ...activeClassesDark];
+        const inactiveClasses = [...inactiveClassesLight, ...inactiveClassesDark];
+
+        if (viewName === 'calendar') {
+            listView.classList.add('hidden');
+            calendarView.classList.remove('hidden');
+            
+            listBtn.classList.remove(...activeClasses);
+            listBtn.classList.add(...inactiveClasses);
+            
+            calendarBtn.classList.remove(...inactiveClasses);
+            calendarBtn.classList.add(...activeClasses);
+            
+            // Render calendar after it becomes visible to fix layout issues
+            setTimeout(() => { calendar.render(); }, 10);
+        } else {
+            calendarView.classList.add('hidden');
+            listView.classList.remove('hidden');
+            
+            calendarBtn.classList.remove(...activeClasses);
+            calendarBtn.classList.add(...inactiveClasses);
+            
+            listBtn.classList.remove(...inactiveClasses);
+            listBtn.classList.add(...activeClasses);
+        }
+    }
+
     function openScheduleModal() {
         document.getElementById('scheduleModal').classList.remove('hidden');
     }

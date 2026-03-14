@@ -1,0 +1,14 @@
+Django>=4.2
+djangorestframework
+celery
+redis
+upstash-redis
+psycopg2-binary
+stripe
+openai
+requests
+google-auth-oauthlib
+google-api-python-client
+Pillow
+daphne
+iyzipay==1.0.46
