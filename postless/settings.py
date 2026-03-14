@@ -95,7 +95,7 @@ ASGI_APPLICATION = 'postless.asgi.application'
 IYZICO_API_KEY = os.environ.get('IYZICO_API_KEY', 'sandbox-A51P519o6I1L9q5y2Q0A5Y7V6X4J8u3w')
 IYZICO_SECRET_KEY = os.environ.get('IYZICO_SECRET_KEY', 'sandbox-S6v0L2J5q7V4w1O9n3B8M5X2U1G4k6e')
 IYZICO_BASE_URL = os.environ.get('IYZICO_BASE_URL', 'https://sandbox-api.iyzipay.com')
-IYZICO_CALLBACK_URL = 'https://clementine-unlegalized-nichole.ngrok-free.dev/users/payment/callback/'
+IYZICO_CALLBACK_URL = 'https://www.postless.solutions/users/payment/callback/'
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
@@ -172,12 +172,12 @@ FACEBOOK_APP_ID = os.environ.get('FACEBOOK_APP_ID', '5252245341667289')
 FACEBOOK_APP_SECRET = os.environ.get('FACEBOOK_APP_SECRET', '63af153f0b1d4ca16f8c5ef2765e5d62')
 
 # Bu değişken kodda kullanılmıyor olabilir, ancak tutarlılık için callback adresiyle aynı olması önerilir
-FACEBOOK_OAUTH_REDIRECT_URI = 'https://clementine-unlegalized-nichole.ngrok-free.dev/api/social-accounts/instagram_callback/'
+FACEBOOK_OAUTH_REDIRECT_URI = 'https://www.postless.solutions/api/social-accounts/instagram_callback/'
 
 # Instagram Configuration
 INSTAGRAM_APP_ID = '1640423764050164'
 INSTAGRAM_CLIENT_SECRET = 'ba98f80f287a12789caaeaf1d70ad490'
-INSTAGRAM_REDIRECT_URI = 'https://clementine-unlegalized-nichole.ngrok-free.dev/api/social-accounts/instagram_callback/'
+INSTAGRAM_REDIRECT_URI = 'https://www.postless.solutions/api/social-accounts/instagram_callback/'
 INSTAGRAM_ACCESS_TOKEN = 'EABKo46ncZC9kBQ82nC4Va0NwXMgpVLCC4ZAQTDJ734UFUEm2OkmOKM3t84MrV9baG81JNpT27zHZCcOHL9teZApEE4r6dWslHYzEUZCb0WgNc8viBZBYZBZCA6FBIv97V1CMZCiNfhZCiyfw2M7PKHeejIC8QaFHVKNZCvuNDDSNQPJHHELtZAgZBZB78wX2JM97Pghn4fqld0NPBfjZBHlZAQZDZD'
 INSTAGRAM_ACCOUNT_ID = '17841480699522650'
 META_WEBHOOK_VERIFY_TOKEN = os.environ.get(
@@ -188,7 +188,7 @@ META_WEBHOOK_VERIFY_TOKEN = os.environ.get(
 # YouTube Configuration
 YOUTUBE_CLIENT_ID = os.environ.get('YOUTUBE_CLIENT_ID', '935602501203-vfpajcescc17kg3nbei7ck8nrulf33k7.apps.googleusercontent.com')
 YOUTUBE_CLIENT_SECRET = os.environ.get('YOUTUBE_CLIENT_SECRET', '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')
-YOUTUBE_REDIRECT_URI = 'https://clementine-unlegalized-nichole.ngrok-free.dev/api/social-accounts/youtube_callback/'
+YOUTUBE_REDIRECT_URI = 'https://www.postless.solutions/api/social-accounts/youtube_callback/'
 
 # OpenAI Configuration
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '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')
