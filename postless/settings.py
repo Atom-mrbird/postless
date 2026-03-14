@@ -26,7 +26,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-vf*0g94mj7j_m$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['clementine-unlegalized-nichole.ngrok-free.dev', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['', 'localhost', '127.0.0.1']
 
 CSRF_TRUSTED_ORIGINS = [
     'https://clementine-unlegalized-nichole.ngrok-free.dev',

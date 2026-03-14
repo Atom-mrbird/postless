@@ -12,3 +12,4 @@ google-api-python-client
 Pillow
 daphne
 iyzipay==1.0.46
+gunicorn
