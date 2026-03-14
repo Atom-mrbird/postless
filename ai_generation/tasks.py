@@ -9,12 +9,50 @@ import logging
 logger = logging.getLogger(__name__)
 
 @shared_task
+def run_single_strategy(strategy_id):
+    """
+    Executes a single strategy immediately.
+    Used for manual triggers via UI.
+    """
+    try:
+        strategy = ContentStrategy.objects.get(id=strategy_id)
+        now = timezone.now()
+        
+        logger.info(f"Manual trigger: Starting AI Pipeline for strategy: {strategy.title}")
+        
+        # 1. GENERATE CONTENT
+        content = generate_and_save_content(
+            user=strategy.user,
+            concept_prompt=strategy.concept_prompt,
+            content_type=strategy.content_type
+        )
+        
+        # 2. SCHEDULE IT (Immediately + 2 mins)
+        scheduled_dt = now + datetime.timedelta(minutes=2)
+        
+        Schedule.objects.create(
+            user=strategy.user,
+            content=content,
+            platform=strategy.platform,
+            scheduled_time=scheduled_dt,
+            status='pending'
+        )
+        
+        # 3. UPDATE STRATEGY
+        strategy.is_active = True
+        strategy.last_run_at = now
+        strategy.save()
+        
+        return f"Success: Strategy {strategy.title} executed."
+    except Exception as e:
+        logger.error(f"Error in manual strategy run: {str(e)}")
+        return str(e)
+
+@shared_task
 def run_content_strategies():
     """
     Checks active strategies and generates/schedules content if needed.
     Runs periodically (e.g., every hour) via Celery Beat.
-    
-    This is the core of the "AI Content Factory" architecture.
     """
     now = timezone.now()
     active_strategies = ContentStrategy.objects.filter(is_active=True)
@@ -22,7 +60,6 @@ def run_content_strategies():
     results = []
     
     for strategy in active_strategies:
-        # Determine if we should run today
         should_run = False
         
         if not strategy.last_run_at:
@@ -36,7 +73,7 @@ def run_content_strategies():
         
         if should_run:
             try:
-                # Check if we already scheduled a post for today for this strategy to avoid duplicates
+                # Check for duplicates
                 today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
                 already_scheduled = Schedule.objects.filter(
                     user=strategy.user,
@@ -45,12 +82,9 @@ def run_content_strategies():
                 ).exists()
 
                 if already_scheduled:
-                    logger.info(f"Content already scheduled for strategy '{strategy.title}' today. Skipping.")
                     continue
 
-                logger.info(f"Starting AI Pipeline for strategy: {strategy.title}")
-                
-                # 1. GENERATE CONTENT (AI Pipeline)
+                # 1. GENERATE CONTENT
                 content = generate_and_save_content(
                     user=strategy.user,
                     concept_prompt=strategy.concept_prompt,
@@ -62,7 +96,6 @@ def run_content_strategies():
                 scheduled_dt = timezone.datetime.combine(now.date(), preferred_time)
                 scheduled_dt = timezone.make_aware(scheduled_dt)
                 
-                # If preferred time has passed today, schedule for tomorrow
                 if scheduled_dt < now:
                     scheduled_dt += datetime.timedelta(days=1)
                 
@@ -78,13 +111,9 @@ def run_content_strategies():
                 strategy.last_run_at = now
                 strategy.save()
                 
-                msg = f"Strategy '{strategy.title}': Content generated and scheduled for {scheduled_dt}"
-                logger.info(msg)
-                results.append(msg)
+                results.append(f"Strategy '{strategy.title}' scheduled.")
                 
             except Exception as e:
-                err_msg = f"Strategy '{strategy.title}' FAILED: {str(e)}"
-                logger.error(err_msg)
-                results.append(err_msg)
+                results.append(f"Error in {strategy.title}: {str(e)}")
                 
     return results

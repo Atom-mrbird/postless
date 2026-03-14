@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
 from content.models import Content
 from django.contrib import messages
-from .tasks import run_content_strategies
+from .tasks import run_content_strategies, run_single_strategy
 from scheduling.models import Schedule
 from .services import generate_and_save_content
 from django.utils import timezone
@@ -77,47 +77,15 @@ def delete_strategy(request, id):
 @subscription_required
 def run_strategy_now(request, id):
     """
-    Manually triggers a specific strategy and ensures it stays active for future runs.
+    Manually triggers a specific strategy via Celery background task.
+    Ensures the UI stays responsive while heavy AI generation happens.
     """
     strategy = get_object_or_404(ContentStrategy, id=id, user=request.user)
     
-    try:
-        # 1. GENERATE CONTENT (AI)
-        content = generate_and_save_content(
-            user=strategy.user,
-            concept_prompt=strategy.concept_prompt,
-            content_type=strategy.content_type
-        )
-        
-        # 2. SCHEDULE IT
-        # Schedule for the next available slot based on strategy's preferred time
-        now = timezone.now()
-        preferred_time = strategy.time_of_day
-        scheduled_dt = timezone.datetime.combine(now.date(), preferred_time)
-        scheduled_dt = timezone.make_aware(scheduled_dt)
-        
-        # If today's time passed or we want to run "now", schedule it for 2 minutes later
-        if scheduled_dt < now:
-             scheduled_dt = now + datetime.timedelta(minutes=2)
-        
-        Schedule.objects.create(
-            user=strategy.user,
-            content=content,
-            platform=strategy.platform,
-            scheduled_time=scheduled_dt,
-            status='pending'
-        )
-        
-        # 3. ACTIVATE AND UPDATE STRATEGY
-        strategy.is_active = True # Ensure it's active so background task picks it up later
-        strategy.last_run_at = now
-        strategy.save()
-        
-        messages.success(request, f'"{strategy.title}" stratejisi çalıştırıldı ve AKTİF duruma getirildi. İlk içerik {scheduled_dt.strftime("%H:%M")} için planlandı. Sistem her gün bu saatte paylaşım yapmaya devam edecektir.')
-        
-    except Exception as e:
-        messages.error(request, f'Hata: {str(e)}')
-        
+    # Trigger the AI generation and scheduling pipeline in the background
+    run_single_strategy.delay(strategy.id)
+    
+    messages.success(request, f'"{strategy.title}" stratejisi arka planda başlatıldı. Yapay zeka içeriği üretecek ve paylaşımı otomatik olarak planlayacaktır. Bu işlem birkaç dakika sürebilir.')
     return redirect('automation')
 
 @csrf_exempt
