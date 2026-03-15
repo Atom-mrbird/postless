@@ -161,8 +161,7 @@ MEDIA_ROOT = BASE_DIR / 'uploads'
 
 AUTH_USER_MODEL = 'users.User'
 
-REDIS_URL = os.environ.get('REDIS_URL', 'redis://default:vqfXsxtiNioRoxLwXtzNZoGfiissQQCe@redis.railway.internal:6379')
-
+REDIS_URL = os.environ.get("REDIS_URL")
 # Celery Configuration
 CELERY_BROKER_URL = os.getenv("REDIS_URL")
 CELERY_RESULT_BACKEND = os.getenv("REDIS_URL")
