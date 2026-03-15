@@ -68,7 +68,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'users.middleware.SubscriptionMiddleware',
 ]
 
 ROOT_URLCONF = 'postless.urls'
@@ -162,34 +161,15 @@ MEDIA_ROOT = BASE_DIR / 'uploads'
 
 AUTH_USER_MODEL = 'users.User'
 
-# postless/settings.py
-
-import os
-from pathlib import Path
-import dj_database_url
-
-# ... (diğer ayarlar) ...
-
-# Redis Configuration
-# For Railway deployments, REDIS_URL will be provided as an environment variable.
-# For local development, you might run a local Redis or use a different URL.
-REDIS_URL = os.environ.get('REDIS_URL')
-
-if not REDIS_URL:
-    # Fallback for local development if REDIS_URL is not set in environment
-    # This assumes a local Redis is running on default port 6379
-    REDIS_URL = 'redis://vqfXsxtiNioRoxLwXtzNZoGfiissQQCe@redis.railway.internal:6379'
-    print("WARNING: REDIS_URL environment variable not set. Using local Redis for development.")
+REDIS_URL = os.environ.get('REDIS_URL', 'redis://vqfXsxtiNioRoxLwXtzNZoGfiissQQCe@redis.railway.internal:6379')
 
 # Celery Configuration
-CELERY_BROKER_URL = REDIS_URL
-CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+CELERY_BROKER_URL = os.getenv("REDIS_URL")
+CELERY_RESULT_BACKEND = os.getenv("REDIS_URL")
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
-
-# ... (diğer ayarlar) ...
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
