@@ -178,7 +178,7 @@ REDIS_URL = os.environ.get('REDIS_URL')
 if not REDIS_URL:
     # Fallback for local development if REDIS_URL is not set in environment
     # This assumes a local Redis is running on default port 6379
-    REDIS_URL = 'redis://default:vqfXsxtiNioRoxLwXtzNZoGfiissQQCe@redis.railway.internal:6379'
+    REDIS_URL = 'redis://vqfXsxtiNioRoxLwXtzNZoGfiissQQCe@redis.railway.internal:6379'
     print("WARNING: REDIS_URL environment variable not set. Using local Redis for development.")
 
 # Celery Configuration
