@@ -161,13 +161,11 @@ MEDIA_ROOT = BASE_DIR / 'uploads'
 
 AUTH_USER_MODEL = 'users.User'
 
-# Upstash Redis Configuration
-UPSTASH_REDIS_TOKEN = "AZPeAAIncDFhODRiYzBiOWMzNGU0MTY2OTVhOWY4YzliYTE0OTk5MnAxMzc4NTQ"
-UPSTASH_REDIS_HOST = "amused-reptile-37854.upstash.io"
+REDIS_URL = os.environ.get('REDIS_URL', 'redis://crossover.proxy.rlwy.net:6379/0')
 
-# Celery Configuration (Correct URL format for Upstash)
-CELERY_BROKER_URL = f"rediss://default:{UPSTASH_REDIS_TOKEN}@{UPSTASH_REDIS_HOST}:6379?ssl_cert_reqs=none"
-CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+# Celery Configuration
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
