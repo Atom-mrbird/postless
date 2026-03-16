@@ -15,7 +15,13 @@ def run_single_strategy(strategy_id):
     Used for manual triggers via UI.
     """
     try:
-        strategy = ContentStrategy.objects.get(id=strategy_id)
+        # Fetch the strategy, log if it doesn't exist to prevent Celery crashes
+        try:
+            strategy = ContentStrategy.objects.get(id=strategy_id)
+        except ContentStrategy.DoesNotExist:
+            logger.error(f"Error in manual strategy run: ContentStrategy with ID {strategy_id} does not exist.")
+            return f"Error: ContentStrategy {strategy_id} not found."
+
         now = timezone.now()
         
         logger.info(f"Manual trigger: Starting AI Pipeline for strategy: {strategy.title}")
