@@ -9,11 +9,6 @@ from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
 from content.models import Content
 from django.contrib import messages
-from .tasks import check_automation_strategies, run_single_automation
-from scheduling.models import Schedule
-from .services import generate_and_save_content
-from django.utils import timezone
-import datetime
 import json
 import openai
 import requests
