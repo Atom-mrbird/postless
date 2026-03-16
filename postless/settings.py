@@ -199,7 +199,7 @@ if USE_S3:
          MEDIA_URL = f"{endpoint}{os.environ.get('BUCKET_NAME')}/"
 
 else:
-    MEDIA_URL = '/uploads/'
+    MEDIA_URL = "https://postless-media-8ndofd7w8o.t3.storageapi.dev/"
     MEDIA_ROOT = BASE_DIR / 'uploads'
 
 AUTH_USER_MODEL = 'users.User'
