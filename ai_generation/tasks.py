@@ -8,8 +8,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-@shared_task
-def run_single_strategy(strategy_id):
+@shared_task(bind=True, max_retries=3)
+def run_single_strategy(self, strategy_id):
     """
     Executes a single strategy immediately.
     Used for manual triggers via UI.
@@ -21,7 +21,9 @@ def run_single_strategy(strategy_id):
         try:
             strategy_id = int(strategy_id)
         except (ValueError, TypeError):
-            pass # Keep it as is if it can't be converted
+            logger.warning(f"strategy_id {strategy_id} could not be converted to int")
+            # If it can't be converted, it's likely invalid. Re-raise.
+            raise ContentStrategy.DoesNotExist(f"Invalid strategy_id: {strategy_id}")
 
         # Fetch the strategy explicitly
         strategy = ContentStrategy.objects.get(id=strategy_id)
@@ -53,15 +55,14 @@ def run_single_strategy(strategy_id):
         strategy.save()
         
         return f"Success: Strategy {strategy.title} executed."
-    except ContentStrategy.DoesNotExist:
+    except ContentStrategy.DoesNotExist as e:
         err_msg = f"Error: ContentStrategy with ID {strategy_id} does not exist."
         logger.error(err_msg)
-        # Using return instead of raise to prevent retry loops in some Celery configs,
-        # but the actual worker must see the new code to behave differently.
-        return err_msg
+        # Re-raising the exception for Celery to handle it properly (retry/mark as failed)
+        raise self.retry(exc=e, countdown=5) # Retry after 5 seconds
     except Exception as e:
         logger.error(f"Error in manual strategy run: {str(e)}")
-        raise e
+        raise self.retry(exc=e, countdown=5) # Retry after 5 seconds
 
 @shared_task
 def run_content_strategies():
