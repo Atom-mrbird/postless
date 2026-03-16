@@ -190,13 +190,10 @@ if USE_S3:
     # Custom Domain
     AWS_S3_CUSTOM_DOMAIN = f"{os.environ.get('BUCKET_NAME')}.{os.environ.get('BUCKET_ENDPOINT').split('//')[1]}" if os.environ.get('BUCKET_ENDPOINT') and '//' in os.environ.get('BUCKET_ENDPOINT') else None
     
-    if AWS_S3_CUSTOM_DOMAIN and not ('r2.cloudflarestorage.com' in str(os.environ.get('BUCKET_ENDPOINT'))):
-         MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
-    else:
-         endpoint = os.environ.get('BUCKET_ENDPOINT', '')
-         if endpoint and not endpoint.endswith('/'):
-             endpoint += '/'
-         MEDIA_URL = f"{endpoint}{os.environ.get('BUCKET_NAME')}/"
+    endpoint = os.environ.get('BUCKET_ENDPOINT', '')
+    if endpoint and not endpoint.endswith('/'):
+        endpoint += '/'
+    MEDIA_URL = endpoint
 
 else:
     MEDIA_URL = "https://postless-media-8ndofd7w8o.t3.storageapi.dev/"
