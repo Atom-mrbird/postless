@@ -83,6 +83,7 @@ def run_strategy_now(request, id):
     strategy = get_object_or_404(ContentStrategy, id=id, user=request.user)
     
     # Trigger the AI generation and scheduling pipeline in the background
+    # Pass strategy.id directly to avoid string conversion issues in some Celery setups
     run_single_strategy.delay(strategy.id)
     
     messages.success(request, f'"{strategy.title}" stratejisi arka planda başlatıldı. Yapay zeka içeriği üretecek ve paylaşımı otomatik olarak planlayacaktır. Bu işlem birkaç dakika sürebilir.')

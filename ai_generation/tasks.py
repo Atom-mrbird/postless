@@ -17,6 +17,12 @@ def run_single_strategy(strategy_id):
     logger.info(f"Task received with strategy_id: {strategy_id}, type: {type(strategy_id)}")
 
     try:
+        # Some databases or drivers might pass strategy_id as string, ensure it is an int for lookup
+        try:
+            strategy_id = int(strategy_id)
+        except (ValueError, TypeError):
+            pass # Keep it as is if it can't be converted
+
         # Fetch the strategy explicitly
         strategy = ContentStrategy.objects.get(id=strategy_id)
         now = timezone.now()
