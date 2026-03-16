@@ -8,24 +8,13 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-@shared_task(bind=True, max_retries=3)
-def run_single_strategy(self, strategy_id):
+@shared_task
+def run_single_strategy(strategy_id):
     """
     Executes a single strategy immediately.
     Used for manual triggers via UI.
     """
-    logger.info(f"Task received with strategy_id: {strategy_id}, type: {type(strategy_id)}")
-
     try:
-        # Some databases or drivers might pass strategy_id as string, ensure it is an int for lookup
-        try:
-            strategy_id = int(strategy_id)
-        except (ValueError, TypeError):
-            logger.warning(f"strategy_id {strategy_id} could not be converted to int")
-            # If it can't be converted, it's likely invalid. Re-raise.
-            raise ContentStrategy.DoesNotExist(f"Invalid strategy_id: {strategy_id}")
-
-        # Fetch the strategy explicitly
         strategy = ContentStrategy.objects.get(id=strategy_id)
         now = timezone.now()
         
@@ -58,11 +47,10 @@ def run_single_strategy(self, strategy_id):
     except ContentStrategy.DoesNotExist as e:
         err_msg = f"Error: ContentStrategy with ID {strategy_id} does not exist."
         logger.error(err_msg)
-        # Re-raising the exception for Celery to handle it properly (retry/mark as failed)
-        raise self.retry(exc=e, countdown=5) # Retry after 5 seconds
+        raise e  # Re-raise the original exception
     except Exception as e:
         logger.error(f"Error in manual strategy run: {str(e)}")
-        raise self.retry(exc=e, countdown=5) # Retry after 5 seconds
+        raise  # Re-raise without catching
 
 @shared_task
 def run_content_strategies():
