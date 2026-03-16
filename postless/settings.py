@@ -170,31 +170,31 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 USE_S3 = os.environ.get('USE_S3') == 'TRUE' or os.environ.get('BUCKET_NAME') is not None
 
 if USE_S3:
-    # S3 Configuration
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-    AWS_STORAGE_BUCKET_NAME = os.environ.get('BUCKET_NAME')
-    AWS_S3_REGION_NAME = os.environ.get('BUCKET_REGION')
-    AWS_S3_ENDPOINT_URL = os.environ.get('BUCKET_ENDPOINT')
-    AWS_ACCESS_KEY_ID = os.environ.get('BUCKET_ACCESS_KEY')
-    AWS_SECRET_ACCESS_KEY = os.environ.get('BUCKET_SECRET_KEY')
-    # Required for Cloudflare R2 / Custom S3 providers
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+            "OPTIONS": {
+                "access_key": os.getenv("BUCKET_ACCESS_KEY"),
+                "secret_key": os.getenv("BUCKET_SECRET_KEY"),
+                "bucket_name": os.getenv("BUCKET_NAME"),
+                "region_name": os.getenv("BUCKET_REGION"),
+                "endpoint_url": os.getenv("BUCKET_ENDPOINT"),
+                "use_ssl": True,
+            }
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
+    
+    # Custom Domain
     AWS_S3_CUSTOM_DOMAIN = f"{os.environ.get('BUCKET_NAME')}.{os.environ.get('BUCKET_ENDPOINT').split('//')[1]}" if os.environ.get('BUCKET_ENDPOINT') else None
-    AWS_S3_USE_SSL = True
-    AWS_QUERYSTRING_AUTH = False  # Public URLs
     
-    # If using R2, you might need these
-    AWS_S3_FILE_OVERWRITE = False
-    AWS_DEFAULT_ACL = 'public-read'
-    
-    # For R2 specifically, we often don't want the bucket name in the custom domain if using a custom URL
-    if 'r2.cloudflarestorage.com' in str(AWS_S3_ENDPOINT_URL):
-         AWS_S3_CUSTOM_DOMAIN = None
-         
-    if AWS_S3_CUSTOM_DOMAIN:
+    if AWS_S3_CUSTOM_DOMAIN and not ('r2.cloudflarestorage.com' in str(os.environ.get('BUCKET_ENDPOINT'))):
          MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
     else:
-         # Fallback to default Boto3 URL construction
-         pass
+         MEDIA_URL = f"{os.environ.get('BUCKET_ENDPOINT')}/{os.environ.get('BUCKET_NAME')}/"
+
 else:
     MEDIA_URL = '/uploads/'
     MEDIA_ROOT = BASE_DIR / 'uploads'
