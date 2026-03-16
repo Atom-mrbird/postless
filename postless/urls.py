@@ -24,8 +24,8 @@ urlpatterns = [
     path('pricing/', pricing_page, name='pricing'),
     path('ai/', ai_generator_page, name='ai_generator'),
     path('automation/', automation_page, name='automation'),
-    path('automation/delete/<int:id>/', delete_strategy, name='delete_strategy'),
-    path('automation/run/<int:id>/', run_strategy_now, name='run_strategy_now'),
+    path('automation/delete/<uuid:id>/', delete_strategy, name='delete_strategy'),
+    path('automation/run/<uuid:id>/', run_strategy_now, name='run_strategy_now'),
     
     # AI API Routes
     path('api/generate-content/', generate_content, name='generate_content'),
