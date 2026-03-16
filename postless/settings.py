@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'scheduling',
     'publishing',
     'analytics',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -129,7 +130,6 @@ else:
         }
     }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
@@ -166,7 +166,10 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-if os.environ.get('BUCKET_NAME'):
+
+USE_S3 = os.environ.get('USE_S3') == 'TRUE' or os.environ.get('BUCKET_NAME') is not None
+
+if USE_S3:
     # S3 Configuration
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     AWS_STORAGE_BUCKET_NAME = os.environ.get('BUCKET_NAME')
@@ -174,13 +177,27 @@ if os.environ.get('BUCKET_NAME'):
     AWS_S3_ENDPOINT_URL = os.environ.get('BUCKET_ENDPOINT')
     AWS_ACCESS_KEY_ID = os.environ.get('BUCKET_ACCESS_KEY')
     AWS_SECRET_ACCESS_KEY = os.environ.get('BUCKET_SECRET_KEY')
-    AWS_S3_CUSTOM_DOMAIN = f"{os.environ.get('BUCKET_NAME')}.{os.environ.get('BUCKET_ENDPOINT').split('//')[1]}"
+    # Required for Cloudflare R2 / Custom S3 providers
+    AWS_S3_CUSTOM_DOMAIN = f"{os.environ.get('BUCKET_NAME')}.{os.environ.get('BUCKET_ENDPOINT').split('//')[1]}" if os.environ.get('BUCKET_ENDPOINT') else None
     AWS_S3_USE_SSL = True
     AWS_QUERYSTRING_AUTH = False  # Public URLs
-    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
+    
+    # If using R2, you might need these
+    AWS_S3_FILE_OVERWRITE = False
+    AWS_DEFAULT_ACL = 'public-read'
+    
+    # For R2 specifically, we often don't want the bucket name in the custom domain if using a custom URL
+    if 'r2.cloudflarestorage.com' in str(AWS_S3_ENDPOINT_URL):
+         AWS_S3_CUSTOM_DOMAIN = None
+         
+    if AWS_S3_CUSTOM_DOMAIN:
+         MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
+    else:
+         # Fallback to default Boto3 URL construction
+         pass
 else:
     MEDIA_URL = '/uploads/'
-    MEDIA_ROOT = BASE_DIR / '/uploads/uploads'
+    MEDIA_ROOT = BASE_DIR / 'uploads'
 
 AUTH_USER_MODEL = 'users.User'
 
