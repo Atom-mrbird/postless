@@ -169,18 +169,17 @@ STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 USE_S3 = os.environ.get('USE_S3') == 'TRUE' or os.environ.get('BUCKET_NAME') is not None
-
 if USE_S3:
     STORAGES = {
         "default": {
             "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
             "OPTIONS": {
-                "access_key": os.environ.get("BUCKET_ACCESS_KEY"),
-                "secret_key": os.environ.get("BUCKET_SECRET_KEY"),
-                "bucket_name": os.environ.get("BUCKET_NAME"),
-                "region_name": os.environ.get("BUCKET_REGION"),
-                "endpoint_url": os.environ.get("BUCKET_ENDPOINT"),
-                "use_ssl": True,
+                "ACCESS_KEY": os.environ.get("BUCKET_ACCESS_KEY"),
+                "SECRET_KEY": os.environ.get("BUCKET_SECRET_KEY"),
+                "STORAGE_BUCKET_NAME": os.environ.get("BUCKET_NAME"),
+                "S3_REGION_NAME": os.environ.get("BUCKET_REGION"),
+                "S3_ENDPOINT_URL": os.environ.get("BUCKET_ENDPOINT"),
+                "S3_USE_SSL": True,
             }
         },
         "staticfiles": {
