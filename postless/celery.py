@@ -24,8 +24,8 @@ app.conf.beat_schedule = {
         'schedule': crontab(minute='*'), 
     },
     # Generator Worker: Checks every hour to see if active strategies need new content produced
-    'run-content-strategies-hourly': {
-        'task': 'ai_generation.tasks.run_content_strategies',
+    'check-automation-strategies-hourly': {
+        'task': 'ai_generation.tasks.check_automation_strategies',
         'schedule': crontab(minute='0'), # Runs at the top of every hour
     },
 }

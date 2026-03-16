@@ -1,5 +1,5 @@
 from rest_framework import viewsets
-from .models import AIPrompt, ContentStrategy
+from .models import AIPrompt, AutomationStrategy
 from .serializers import AIPromptSerializer
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
 from content.models import Content
 from django.contrib import messages
-from .tasks import run_content_strategies, run_single_strategy
+from .tasks import check_automation_strategies, run_single_automation
 from scheduling.models import Schedule
 from .services import generate_and_save_content
 from django.utils import timezone
@@ -36,63 +36,69 @@ def ai_generator_page(request):
 @login_required
 @subscription_required
 def automation_page(request):
+    """
+    Manages user automation strategies.
+    Create, List, Toggle strategies.
+    """
     if request.method == 'POST':
-        action = request.POST.get('action', 'create')
+        action = request.POST.get('action')
         
         if action == 'create':
-            ContentStrategy.objects.create(
-                user=request.user,
-                title=request.POST.get('title'),
-                concept_prompt=request.POST.get('concept_prompt'),
-                platform=request.POST.get('platform'),
-                content_type=request.POST.get('content_type'),
-                frequency=request.POST.get('frequency'),
-                time_of_day=request.POST.get('time_of_day'),
-                is_active=True
-            )
-            messages.success(request, 'Strateji başarıyla oluşturuldu ve aktif edildi!')
+            title = request.POST.get('title')
+            concept_prompt = request.POST.get('concept_prompt')
+            platform = request.POST.get('platform')
+            content_type = request.POST.get('content_type')
+            frequency = request.POST.get('frequency')
+            time_of_day = request.POST.get('time_of_day')
+            
+            if all([title, concept_prompt, platform, content_type, frequency, time_of_day]):
+                AutomationStrategy.objects.create(
+                    user=request.user,
+                    title=title,
+                    concept_prompt=concept_prompt,
+                    platform=platform,
+                    content_type=content_type,
+                    frequency=frequency,
+                    time_of_day=time_of_day
+                )
+                messages.success(request, f'"{title}" stratejisi başarıyla oluşturuldu.')
+            else:
+                messages.error(request, 'Lütfen tüm alanları doldurun.')
         
         elif action == 'toggle':
             strategy_id = request.POST.get('strategy_id')
-            try:
-                strategy_id = int(strategy_id)
-            except (ValueError, TypeError):
-                messages.error(request, 'Geçersiz strateji ID.')
-                return redirect('automation')
-                
-            strategy = get_object_or_404(ContentStrategy, id=strategy_id, user=request.user)
+            strategy = get_object_or_404(AutomationStrategy, id=strategy_id, user=request.user)
             strategy.is_active = not strategy.is_active
             strategy.save()
             status = "aktif edildi" if strategy.is_active else "durduruldu"
-            messages.success(request, f'Strateji {status}.')
+            messages.success(request, f'"{strategy.title}" stratejisi {status}.')
             
         return redirect('automation') 
         
-    strategies = ContentStrategy.objects.filter(user=request.user)
+    strategies = AutomationStrategy.objects.filter(user=request.user)
     return render(request, 'automation.html', {'strategies': strategies})
 
 @login_required
 @subscription_required
 def delete_strategy(request, id):
-    strategy = get_object_or_404(ContentStrategy, id=id, user=request.user)
+    """Deletes an automation strategy."""
+    strategy = get_object_or_404(AutomationStrategy, id=id, user=request.user)
+    title = strategy.title
     strategy.delete()
-    messages.success(request, 'Strateji silindi.')
+    messages.success(request, f'"{title}" stratejisi silindi.')
     return redirect('automation')
 
 @login_required
 @subscription_required
 def run_strategy_now(request, id):
-    """
-    Manually triggers a specific strategy via Celery background task.
-    Ensures the UI stays responsive while heavy AI generation happens.
-    """
-    strategy = get_object_or_404(ContentStrategy, id=id, user=request.user)
+    """Manually triggers a strategy in background."""
+    strategy = get_object_or_404(AutomationStrategy, id=id, user=request.user)
     
-    # Trigger the AI generation and scheduling pipeline in the background
-    # Pass strategy.id directly to avoid string conversion issues in some Celery setups
-    run_single_strategy.delay(strategy.id)
+    # Trigger Celery task
+    from .tasks import run_single_automation
+    run_single_automation.delay(str(strategy.id))
     
-    messages.success(request, f'"{strategy.title}" stratejisi arka planda başlatıldı. Yapay zeka içeriği üretecek ve paylaşımı otomatik olarak planlayacaktır. Bu işlem birkaç dakika sürebilir.')
+    messages.success(request, f'"{strategy.title}" arka planda başlatıldı. İçerik üretilip planlanacaktır.')
     return redirect('automation')
 
 @csrf_exempt

@@ -1,137 +1,180 @@
 {% extends 'base.html' %}
 
-{% block title %}Automation - Postless{% endblock %}
+{% block title %}Otomasyon Stratejileri - Postless{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">İçerik Otomasyonu</h1>
-            <p class="text-gray-500 mt-1 dark:text-gray-400">Otonom içerik motorunuzu kurun ve arkanıza yaslanın.</p>
+            <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">İçerik Otomasyonu</h1>
+            <p class="text-lg text-gray-600 mt-2 dark:text-gray-400">Yapay zeka ile otonom içerik üretim motorunuzu yönetin.</p>
         </div>
-        <button onclick="document.getElementById('strategyForm').classList.toggle('hidden')" class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-indigo-600 transition-colors shadow-sm dark:hover:bg-indigo-500">
-            <i class="fa-solid fa-plus mr-2"></i> Yeni Strateji
+        <button onclick="document.getElementById('strategyForm').classList.toggle('hidden')" 
+                class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-all shadow-lg hover:shadow-indigo-500/25 dark:bg-indigo-500 dark:hover:bg-indigo-600">
+            <i class="fa-solid fa-plus mr-2 text-xs"></i> Yeni Strateji Oluştur
         </button>
     </div>
 
     <!-- Strategy Form (Initially Hidden) -->
-    <div id="strategyForm" class="bg-white rounded-xl border border-gray-200 shadow-sm p-8 mb-8 hidden dark:bg-gray-800 dark:border-gray-700">
-        <h3 class="text-lg font-bold text-gray-900 mb-6 dark:text-white">Yeni Otomasyon Stratejisi Oluştur</h3>
-        <form method="POST" class="space-y-6">
+    <div id="strategyForm" class="bg-white rounded-2xl border border-gray-200 shadow-xl p-8 mb-10 hidden dark:bg-gray-800 dark:border-gray-700 transition-all duration-300">
+        <div class="flex items-center justify-between mb-8">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Yeni Otomasyon Stratejisi</h3>
+            <button onclick="document.getElementById('strategyForm').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <i class="fa-solid fa-times text-lg"></i>
+            </button>
+        </div>
+        
+        <form method="POST" class="space-y-8">
             {% csrf_token %}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Strateji Adı</label>
-                    <input type="text" name="title" required placeholder="Örn: Günlük Teknoloji Bilgileri" class="w-full rounded-lg border-gray-300 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500 dark:placeholder-gray-400">
+            <input type="hidden" name="action" value="create">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-2">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Strateji Adı</label>
+                    <input type="text" name="title" required placeholder="Örn: Günlük Teknoloji Haberleri" 
+                           class="w-full rounded-xl border-gray-300 bg-gray-50 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700/50 dark:border-gray-600 dark:text-white transition-all">
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Hedef Platform</label>
-                    <select name="platform" required class="w-full rounded-lg border-gray-300 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500">
+                <div class="space-y-2">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Hedef Platform</label>
+                    <select name="platform" required 
+                            class="w-full rounded-xl border-gray-300 bg-gray-50 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700/50 dark:border-gray-600 dark:text-white transition-all">
                         <option value="Instagram">Instagram</option>
                         <option value="YouTube">YouTube</option>
                     </select>
                 </div>
             </div>
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">İçerik Konsepti</label>
-                <textarea name="concept_prompt" required rows="3" placeholder="Yapay zeka için ana fikri tanımlayın. Örn: 'Uzay keşfi hakkında ilginç gerçekler', 'Verimlilik için hızlı ipuçları', 'Dünyanın her yerinden güzel manzaralar'" class="w-full rounded-lg border-gray-300 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500 dark:placeholder-gray-400"></textarea>
-                <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                    <i class="fa-solid fa-circle-info mr-1"></i> Sistem, bu konsepti temel alarak her seferinde farklı ve özgün içerikler üretecektir.
-                </p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">İçerik Türü</label>
-                    <select name="content_type" required class="w-full rounded-lg border-gray-300 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500">
-                        <option value="image">Görsel (Instagram için)</option>
-                        <option value="video">Video (YouTube/Reels için)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Paylaşım Sıklığı</label>
-                    <select name="frequency" required class="w-full rounded-lg border-gray-300 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500">
-                        <option value="daily">Günlük</option>
-                        <option value="weekly">Haftalık</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Paylaşım Saati</label>
-                    <input type="time" name="time_of_day" required class="w-full rounded-lg border-gray-300 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500 [color-scheme:light] dark:[color-scheme:dark]">
+            <div class="space-y-2">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">İçerik Konsepti (Yapay Zeka Promptu)</label>
+                <textarea name="concept_prompt" required rows="4" 
+                          placeholder="Yapay zekanın ne tür içerikler üretmesini istiyorsunuz? Örn: 'Modern mimari ve minimalist ev tasarımları hakkında ilham verici görseller'" 
+                          class="w-full rounded-xl border-gray-300 bg-gray-50 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700/50 dark:border-gray-600 dark:text-white transition-all"></textarea>
+                <div class="flex items-start gap-2 mt-2 text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg">
+                    <i class="fa-solid fa-lightbulb mt-0.5"></i>
+                    <p>Sistem, her paylaşımda bu konsepti temel alarak OpenAI GPT-4 ve DALL-E 3 ile tamamen özgün içerikler ve açıklamalar üretecektir.</p>
                 </div>
             </div>
 
-            <div class="pt-4 flex justify-end gap-3">
-                <button type="button" onclick="document.getElementById('strategyForm').classList.add('hidden')" class="px-6 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600">İptal</button>
-                <button type="submit" class="px-6 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-indigo-600 transition-colors shadow-sm dark:hover:bg-indigo-500">
-                    Kaydet ve Stratejiyi Aktifleştir
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="space-y-2">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">İçerik Türü</label>
+                    <select name="content_type" required 
+                            class="w-full rounded-xl border-gray-300 bg-gray-50 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700/50 dark:border-gray-600 dark:text-white transition-all">
+                        <option value="image">Görsel (DALL-E 3)</option>
+                        <option value="video">Video (Sora/Runway)</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Paylaşım Sıklığı</label>
+                    <select name="frequency" required 
+                            class="w-full rounded-xl border-gray-300 bg-gray-50 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700/50 dark:border-gray-600 dark:text-white transition-all">
+                        <option value="daily">Her Gün</option>
+                        <option value="weekly">Haftada Bir</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Paylaşım Saati</label>
+                    <input type="time" name="time_of_day" required 
+                           class="w-full rounded-xl border-gray-300 bg-gray-50 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700/50 dark:border-gray-600 dark:text-white [color-scheme:light] dark:[color-scheme:dark]">
+                </div>
+            </div>
+
+            <div class="pt-6 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-4">
+                <button type="button" onclick="document.getElementById('strategyForm').classList.add('hidden')" 
+                        class="px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-colors dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">İptal</button>
+                <button type="submit" 
+                        class="px-8 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg hover:shadow-indigo-500/25">
+                    Stratejiyi Başlat
                 </button>
             </div>
         </form>
     </div>
 
     <!-- Active Strategies List -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {% for strategy in strategies %}
-        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow flex flex-col dark:bg-gray-800 dark:border-gray-700">
-            <div class="p-6 flex-1">
-                <div class="flex items-start justify-between mb-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-primary dark:bg-indigo-900/30 dark:text-indigo-400">
-                            <i class="fa-solid fa-robot"></i>
+        <div class="group bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-xl hover:border-indigo-200 transition-all duration-300 flex flex-col dark:bg-gray-800 dark:border-gray-700 dark:hover:border-indigo-500/50">
+            <div class="p-8 flex-1">
+                <div class="flex items-start justify-between mb-6">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300 dark:bg-indigo-900/30 dark:text-indigo-400">
+                            <i class="fa-solid fa-robot text-xl"></i>
                         </div>
                         <div>
-                            <h3 class="font-bold text-gray-900 dark:text-white">{{ strategy.title }}</h3>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ strategy.get_frequency_display }} - {{ strategy.time_of_day }}</p>
+                            <h3 class="font-bold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{{ strategy.title }}</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">{{ strategy.get_frequency_display }} • {{ strategy.time_of_day|time:"H:i" }}</p>
                         </div>
                     </div>
                     {% if strategy.is_active %}
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">Aktif</span>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400 ring-1 ring-green-600/20">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-2 animate-pulse"></span>Aktif
+                    </span>
                     {% else %}
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">Durduruldu</span>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400 ring-1 ring-gray-600/20">
+                        Durduruldu
+                    </span>
                     {% endif %}
                 </div>
 
-                <div class="space-y-3 text-sm">
+                <div class="space-y-4 text-sm bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl">
                     <div class="flex items-center justify-between text-gray-600 dark:text-gray-400">
-                        <span>Platform:</span>
-                        <span class="font-medium text-gray-900 dark:text-white">{{ strategy.platform }}</span>
+                        <span class="font-medium">Platform:</span>
+                        <span class="font-bold text-gray-900 dark:text-white flex items-center">
+                            {% if strategy.platform == 'Instagram' %}<i class="fa-brands fa-instagram mr-2 text-pink-500"></i>{% endif %}
+                            {% if strategy.platform == 'YouTube' %}<i class="fa-brands fa-youtube mr-2 text-red-600"></i>{% endif %}
+                            {{ strategy.platform }}
+                        </span>
                     </div>
                     <div class="flex items-center justify-between text-gray-600 dark:text-gray-400">
-                        <span>İçerik:</span>
-                        <span class="font-medium text-gray-900 dark:text-white">{{ strategy.get_content_type_display }}</span>
+                        <span class="font-medium">İçerik:</span>
+                        <span class="font-bold text-gray-900 dark:text-white">{{ strategy.get_content_type_display }}</span>
                     </div>
-                    <div class="pt-2 border-t border-gray-100 dark:border-gray-700">
-                        <p class="text-xs text-gray-500 line-clamp-2 italic dark:text-gray-400">"{{ strategy.concept_prompt }}"</p>
+                    <div class="pt-3 border-t border-gray-200 dark:border-gray-700">
+                        <p class="text-xs text-gray-500 italic dark:text-gray-400 line-clamp-3 leading-relaxed">"{{ strategy.concept_prompt }}"</p>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-gray-50 px-6 py-3 border-t border-gray-200 flex justify-between items-center dark:bg-gray-700/50 dark:border-gray-700">
+            <div class="bg-gray-50/50 px-8 py-4 border-t border-gray-100 flex justify-between items-center dark:bg-gray-900/30 dark:border-gray-700">
                 <div class="flex flex-col">
-                    <span class="text-xs text-gray-500 dark:text-gray-400">Son çalışma:</span>
-                    <span class="text-xs font-medium text-gray-700 dark:text-gray-300">{{ strategy.last_run_at|default:"Henüz Çalışmadı" }}</span>
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-gray-400 dark:text-gray-500">Son Çalışma</span>
+                    <span class="text-xs font-bold text-gray-700 dark:text-gray-300">
+                        {% if strategy.last_run_at %}{{ strategy.last_run_at|date:"d M, H:i" }}{% else %}Bekleniyor{% endif %}
+                    </span>
                 </div>
                 <div class="flex gap-2">
+                    <!-- Toggle Action -->
                     <form method="POST" action="{% url 'automation' %}">
                         {% csrf_token %}
                         <input type="hidden" name="action" value="toggle">
                         <input type="hidden" name="strategy_id" value="{{ strategy.id }}">
-                        <button type="submit" class="p-2 bg-white border border-gray-300 rounded {% if strategy.is_active %}text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50{% else %}text-green-600 hover:text-green-700 hover:bg-green-50{% endif %} transition-colors dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600" title="{% if strategy.is_active %}Durdur{% else %}Aktifleştir{% endif %}">
-                            <i class="fa-solid {% if strategy.is_active %}fa-pause{% else %}fa-play-circle{% endif %}"></i>
+                        <button type="submit" 
+                                class="p-2.5 bg-white border border-gray-200 rounded-xl transition-all shadow-sm
+                                       {% if strategy.is_active %}text-amber-500 hover:bg-amber-50 hover:border-amber-200{% else %}text-green-500 hover:bg-green-50 hover:border-green-200{% endif %} 
+                                       dark:bg-gray-800 dark:border-gray-600" 
+                                title="{% if strategy.is_active %}Durdur{% else %}Aktifleştir{% endif %}">
+                            <i class="fa-solid {% if strategy.is_active %}fa-pause{% else %}fa-play{% endif %}"></i>
                         </button>
                     </form>
+                    
+                    <!-- Run Now Action -->
                     <form method="POST" action="{% url 'run_strategy_now' strategy.id %}">
                         {% csrf_token %}
-                        <button type="submit" class="p-2 bg-white border border-gray-300 rounded text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 transition-colors dark:bg-gray-700 dark:border-gray-600 dark:text-indigo-400 dark:hover:bg-gray-600 dark:hover:text-indigo-300" title="Şimdi Çalıştır">
+                        <button type="submit" 
+                                class="p-2.5 bg-white border border-gray-200 rounded-xl text-indigo-600 hover:bg-indigo-50 hover:border-indigo-200 transition-all shadow-sm dark:bg-gray-800 dark:border-gray-600" 
+                                title="Şimdi Çalıştır">
                             <i class="fa-solid fa-bolt"></i>
                         </button>
                     </form>
-                    <form method="POST" action="{% url 'delete_strategy' strategy.id %}" onsubmit="return confirm('Bu stratejiyi silmek istediğinizden emin misiniz?');">
+
+                    <!-- Delete Action -->
+                    <form method="POST" action="{% url 'delete_strategy' strategy.id %}" onsubmit="return confirm('Bu otomasyon stratejisini silmek istediğinizden emin misiniz?');">
                         {% csrf_token %}
-                        <button type="submit" class="p-2 bg-white border border-gray-300 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-red-400" title="Sil">
+                        <button type="submit" 
+                                class="p-2.5 bg-white border border-gray-200 rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 hover:border-red-200 transition-all shadow-sm dark:bg-gray-800 dark:border-gray-600" 
+                                title="Sil">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </form>
@@ -139,9 +182,16 @@
             </div>
         </div>
         {% empty %}
-        <div class="col-span-full py-12 text-center text-gray-400 dark:text-gray-500">
-            <i class="fa-solid fa-robot text-4xl mb-3 opacity-20"></i>
-            <p>Aktif strateji bulunamadı. Otomatikleştirmeye başlamak için bir tane oluşturun!</p>
+        <div class="col-span-full py-24 text-center">
+            <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 dark:bg-gray-800">
+                <i class="fa-solid fa-robot text-5xl text-gray-200 dark:text-gray-700"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Henüz strateji yok</h3>
+            <p class="text-gray-500 dark:text-gray-400 mb-8 max-w-sm mx-auto">Otomatik içerik üretimine başlamak için ilk stratejinizi şimdi oluşturun!</p>
+            <button onclick="document.getElementById('strategyForm').classList.remove('hidden')" 
+                    class="px-8 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg hover:shadow-indigo-500/25">
+                İlk Stratejini Oluştur
+            </button>
         </div>
         {% endfor %}
     </div>
