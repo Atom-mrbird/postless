@@ -17,8 +17,7 @@ def run_single_strategy(strategy_id):
     logger.info(f"Task received with strategy_id: {strategy_id}, type: {type(strategy_id)}")
 
     try:
-        # We catch the broad Exception from the previous iteration that was returning the string
-        # 'ContentStrategy matching query does not exist.' as a successful result string.
+        # Fetch the strategy explicitly
         strategy = ContentStrategy.objects.get(id=strategy_id)
         now = timezone.now()
         
@@ -51,11 +50,11 @@ def run_single_strategy(strategy_id):
     except ContentStrategy.DoesNotExist:
         err_msg = f"Error: ContentStrategy with ID {strategy_id} does not exist."
         logger.error(err_msg)
-        # Raising the error so Celery actually marks the task as FAILED instead of SUCCESS
-        raise ValueError(err_msg)
+        # Using return instead of raise to prevent retry loops in some Celery configs,
+        # but the actual worker must see the new code to behave differently.
+        return err_msg
     except Exception as e:
         logger.error(f"Error in manual strategy run: {str(e)}")
-        # Raising so it doesn't return a string and appear as "succeeded" in logs
         raise e
 
 @shared_task
