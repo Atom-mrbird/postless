@@ -25,45 +25,68 @@ def run_single_strategy(self, strategy_id):
                 logger.warning(f"strategy_id {strategy_id} could not be converted to int")
                 return f"Error: Invalid strategy_id: {strategy_id}"
 
+        # Fetch strategy without using .get() to avoid raising DoesNotExist here
         strategy = ContentStrategy.objects.filter(id=strategy_id).first()
 
         if not strategy:
-            logger.error(f"Strategy id {strategy_id} not found")
+            logger.error(f"Strategy id {strategy_id} not found in database.")
             return f"Strategy {strategy_id} not found"
+        
+        # Verify user exists before proceeding (ForeignKey access could theoretically raise if broken)
+        try:
+            strategy_user = strategy.user
+            if not strategy_user:
+                 logger.error(f"Strategy {strategy_id} has no associated user.")
+                 return "Error: Strategy has no associated user."
+        except Exception as user_err:
+            logger.error(f"Could not access user for strategy {strategy_id}: {str(user_err)}")
+            return f"Error: Strategy user is inaccessible: {str(user_err)}"
+
         now = timezone.now()
 
-        logger.info(f"Manual trigger: Starting AI Pipeline for strategy: {strategy.title}")
+        logger.info(f"Manual trigger: Starting AI Pipeline for strategy: {strategy.title} (ID: {strategy.id})")
 
         # 1. GENERATE CONTENT
-        content = generate_and_save_content(
-            user=strategy.user,
-            concept_prompt=strategy.concept_prompt,
-            content_type=strategy.content_type
-        )
+        try:
+            content = generate_and_save_content(
+                user=strategy.user,
+                concept_prompt=strategy.concept_prompt,
+                content_type=strategy.content_type
+            )
+        except Exception as gen_err:
+            logger.error(f"Content generation failed for strategy {strategy_id}: {str(gen_err)}")
+            return f"Error generating content: {str(gen_err)}"
 
         # 2. SCHEDULE IT (Immediately + 1 mins to avoid past errors in worker)
         scheduled_dt = now + datetime.timedelta(minutes=1)
 
-        Schedule.objects.create(
-            user=strategy.user,
-            content=content,
-            platform=strategy.platform,
-            scheduled_time=scheduled_dt,
-            status='pending'
-        )
+        try:
+            Schedule.objects.create(
+                user=strategy.user,
+                content=content,
+                platform=strategy.platform,
+                scheduled_time=scheduled_dt,
+                status='pending'
+            )
+        except Exception as sched_err:
+            logger.error(f"Scheduling failed for strategy {strategy_id}: {str(sched_err)}")
+            return f"Error scheduling content: {str(sched_err)}"
 
         # 3. UPDATE STRATEGY
-        strategy.is_active = True
-        strategy.last_run_at = now
-        strategy.save()
+        try:
+            strategy.is_active = True
+            strategy.last_run_at = now
+            strategy.save()
+        except Exception as save_err:
+            logger.error(f"Final strategy update failed for strategy {strategy_id}: {str(save_err)}")
+            # Even if update fails, content was generated and scheduled
+            return f"Success: Strategy {strategy.title} executed (but failed to update last_run_at)."
 
         return f"Success: Strategy {strategy.title} executed."
-    except ContentStrategy.DoesNotExist:
-        err_msg = f"Error: ContentStrategy with ID {strategy_id} does not exist."
-        logger.error(err_msg)
-        return err_msg
     except Exception as e:
-        logger.error(f"Error in manual strategy run: {str(e)}")
+        import traceback
+        error_details = traceback.format_exc()
+        logger.error(f"Error in manual strategy run: {str(e)}\n{error_details}")
         raise e
 
 @shared_task
@@ -103,6 +126,15 @@ def run_content_strategies():
             try:
                 # Check for duplicates scheduled for today
                 today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+                
+                # Verify user exists before proceeding
+                try:
+                    strategy_user = strategy.user
+                except Exception as user_err:
+                    logger.error(f"Could not access user for strategy {strategy.id}: {str(user_err)}")
+                    results.append(f"Error in {strategy.title}: User inaccessible")
+                    continue
+
                 already_scheduled = Schedule.objects.filter(
                     user=strategy.user,
                     content__title__startswith=f"Auto: {strategy.concept_prompt[:40]}",
@@ -145,6 +177,9 @@ def run_content_strategies():
                 results.append(f"Strategy '{strategy.title}' scheduled.")
                 
             except Exception as e:
+                import traceback
+                error_details = traceback.format_exc()
+                logger.error(f"Error in automated strategy {strategy.id}: {str(e)}\n{error_details}")
                 results.append(f"Error in {strategy.title}: {str(e)}")
                 
     return results
