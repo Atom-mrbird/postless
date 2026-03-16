@@ -97,23 +97,20 @@ def publish_to_instagram(schedule):
         return False, {"error": "Instagram Account ID missing. Connect account."}
         
     # Resolve public URL for the media
-    base_url = settings.CSRF_TRUSTED_ORIGINS[0] if getattr(settings, 'CSRF_TRUSTED_ORIGINS', None) else "http://localhost:8000"
-    if not base_url.startswith('http'):
-         base_url = f"https://{base_url}"
-         
-    if content.file.url.startswith('/'):
-         media_url = f"{base_url}{content.file.url}"
+    # If the URL already starts with http (like an S3 bucket URL), use it directly.
+    # Otherwise, prepend the base domain.
+    if content.file.url.startswith('http://') or content.file.url.startswith('https://'):
+        media_url = content.file.url
     else:
-         media_url = f"{base_url}/{content.file.url}"
+        base_url = settings.CSRF_TRUSTED_ORIGINS[0] if getattr(settings, 'CSRF_TRUSTED_ORIGINS', None) else "http://localhost:8000"
+        if not base_url.startswith('http'):
+             base_url = f"https://{base_url}"
+             
+        if content.file.url.startswith('/'):
+             media_url = f"{base_url}{content.file.url}"
+        else:
+             media_url = f"{base_url}/{content.file.url}"
          
-    # CRITICAL FIX for ngrok URLs: Ensure ngrok does not block the API crawler
-    if 'ngrok' in media_url:
-        # Ngrok often shows a warning page to automated bots. 
-        # Adding ngrok-skip-browser-warning header is usually done on the client side,
-        # but for Instagram scraping our URL, we must ensure the URL is directly accessible.
-        # This is a common issue. If Instagram gets a 400/500 from ngrok, it fails.
-        pass
-    
     caption = content.description
 
     base_url_graph = f"https://graph.facebook.com/v20.0/{ig_user_id}/media"
@@ -138,8 +135,6 @@ def publish_to_instagram(schedule):
         is_image = True
     
     # 2. Step 1: Upload Media Container
-    # FIX: Explicitly enforce media_type based on the URL and content,
-    # specifically ensuring Instagram doesn't reject it due to mismatched type.
     if is_video:
         payload = {
             'media_type': 'REELS',
@@ -149,7 +144,6 @@ def publish_to_instagram(schedule):
         }
     elif is_image:
         payload = {
-            # 'media_type': 'IMAGE' is implied when using image_url
             'image_url': media_url,
             'caption': caption,
             'access_token': access_token
@@ -169,6 +163,9 @@ def publish_to_instagram(schedule):
                 'caption': caption,
                 'access_token': access_token
              }
+
+    # Log payload for debugging
+    logger.info(f"Sending payload to Instagram: {payload}")
 
     creation_res = requests.post(base_url_graph, data=payload)
     creation_data = creation_res.json()

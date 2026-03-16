@@ -23,21 +23,25 @@ def run_single_strategy(self, strategy_id):
             logger.warning(f"strategy_id {strategy_id} could not be converted to int")
             raise ContentStrategy.DoesNotExist(f"Invalid strategy_id: {strategy_id}")
 
-        strategy = ContentStrategy.objects.get(id=strategy_id)
+        strategy = ContentStrategy.objects.filter(id=strategy_id).first()
+        if not strategy:
+            err_msg = f"Error: ContentStrategy with ID {strategy_id} does not exist."
+            logger.error(err_msg)
+            return err_msg
         now = timezone.now()
-        
+
         logger.info(f"Manual trigger: Starting AI Pipeline for strategy: {strategy.title}")
-        
+
         # 1. GENERATE CONTENT
         content = generate_and_save_content(
             user=strategy.user,
             concept_prompt=strategy.concept_prompt,
             content_type=strategy.content_type
         )
-        
-        # 2. SCHEDULE IT (Immediately + 2 mins)
-        scheduled_dt = now + datetime.timedelta(minutes=2)
-        
+
+        # 2. SCHEDULE IT (Immediately + 1 mins to avoid past errors in worker)
+        scheduled_dt = now + datetime.timedelta(minutes=1)
+
         Schedule.objects.create(
             user=strategy.user,
             content=content,
@@ -45,17 +49,17 @@ def run_single_strategy(self, strategy_id):
             scheduled_time=scheduled_dt,
             status='pending'
         )
-        
+
         # 3. UPDATE STRATEGY
         strategy.is_active = True
         strategy.last_run_at = now
         strategy.save()
-        
+
         return f"Success: Strategy {strategy.title} executed."
-    except ContentStrategy.DoesNotExist as e:
+    except ContentStrategy.DoesNotExist:
         err_msg = f"Error: ContentStrategy with ID {strategy_id} does not exist."
         logger.error(err_msg)
-        raise e
+        return err_msg
     except Exception as e:
         logger.error(f"Error in manual strategy run: {str(e)}")
         raise e
@@ -121,8 +125,8 @@ def run_content_strategies():
                 scheduled_dt = timezone.make_aware(scheduled_dt)
                 
                 if scheduled_dt < now:
-                     # If the time passed while generating, just schedule for now + 2 mins
-                     scheduled_dt = now + datetime.timedelta(minutes=2)
+                     # If the time passed while generating, schedule very soon
+                     scheduled_dt = now + datetime.timedelta(minutes=1)
 
                 Schedule.objects.create(
                     user=strategy.user,
