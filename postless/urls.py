@@ -44,5 +44,6 @@ urlpatterns = [
     path('privacy-policy/', TemplateView.as_view(template_name='privacy_policy.html'), name='privacy_policy'),
 ]
 
-if settings.DEBUG:
+# When using S3, we usually don't need this, but it doesn't hurt for local dev
+if settings.DEBUG or not getattr(settings, 'USE_S3', False):
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

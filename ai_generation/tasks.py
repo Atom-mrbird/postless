@@ -8,8 +8,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-@shared_task
-def run_single_strategy(strategy_id):
+@shared_task(bind=True, max_retries=3)
+def run_single_strategy(self, strategy_id):
     """
     Executes a single strategy immediately.
     Used for manual triggers via UI.
@@ -67,7 +67,7 @@ def run_single_strategy(strategy_id):
 def run_content_strategies():
     """
     Checks active strategies and generates/schedules content if needed.
-    Runs periodically (e.g., every hour) via Celery Beat.
+    Runs periodically (e.g., every minute) via Celery Beat.
     """
     now = timezone.now()
     active_strategies = ContentStrategy.objects.filter(is_active=True)
@@ -77,14 +77,26 @@ def run_content_strategies():
     for strategy in active_strategies:
         should_run = False
         
-        if not strategy.last_run_at:
-            should_run = True
-        else:
-            days_since_last = (now.date() - strategy.last_run_at.date()).days
-            if strategy.frequency == 'daily' and days_since_last >= 1:
+        # Check if the strategy's time_of_day has passed for today, and it hasn't run yet today
+        preferred_time = strategy.time_of_day
+        scheduled_dt_today = timezone.datetime.combine(now.date(), preferred_time)
+        scheduled_dt_today = timezone.make_aware(scheduled_dt_today)
+        
+        if now >= scheduled_dt_today:
+            # The time has passed. Let's see if it ran today
+            if not strategy.last_run_at:
                 should_run = True
-            elif strategy.frequency == 'weekly' and days_since_last >= 7:
-                should_run = True
+            else:
+                last_run_local = timezone.localtime(strategy.last_run_at)
+                if last_run_local.date() < now.date():
+                    # It hasn't run today
+                    if strategy.frequency == 'daily':
+                        should_run = True
+                    elif strategy.frequency == 'weekly':
+                        # Example: Check if it's been exactly 7 days
+                        days_since_last = (now.date() - last_run_local.date()).days
+                        if days_since_last >= 7:
+                             should_run = True
         
         if should_run:
             try:
@@ -97,6 +109,9 @@ def run_content_strategies():
                 ).exists()
 
                 if already_scheduled:
+                    # Update last_run_at anyway so we don't keep trying
+                    strategy.last_run_at = now
+                    strategy.save()
                     continue
 
                 # 1. GENERATE CONTENT
@@ -106,19 +121,12 @@ def run_content_strategies():
                     content_type=strategy.content_type
                 )
                 
-                # 2. SCHEDULE IT
-                preferred_time = strategy.time_of_day
-                scheduled_dt = timezone.datetime.combine(now.date(), preferred_time)
-                scheduled_dt = timezone.make_aware(scheduled_dt)
-                
-                if scheduled_dt < now:
-                    scheduled_dt += datetime.timedelta(days=1)
-                
+                # 2. SCHEDULE IT (for the immediate time since it's already passed)
                 Schedule.objects.create(
                     user=strategy.user,
                     content=content,
                     platform=strategy.platform,
-                    scheduled_time=scheduled_dt,
+                    scheduled_time=now + datetime.timedelta(minutes=1), # schedule very soon
                     status='pending'
                 )
                 

@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 from pathlib import Path
 import dj_database_url
-from django.core.files.storage import storages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -176,11 +175,11 @@ if USE_S3:
         "default": {
             "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
             "OPTIONS": {
-                "access_key": os.getenv("BUCKET_ACCESS_KEY"),
-                "secret_key": os.getenv("BUCKET_SECRET_KEY"),
-                "bucket_name": os.getenv("BUCKET_NAME"),
-                "region_name": os.getenv("BUCKET_REGION"),
-                "endpoint_url": os.getenv("BUCKET_ENDPOINT"),
+                "access_key": os.environ.get("BUCKET_ACCESS_KEY"),
+                "secret_key": os.environ.get("BUCKET_SECRET_KEY"),
+                "bucket_name": os.environ.get("BUCKET_NAME"),
+                "region_name": os.environ.get("BUCKET_REGION"),
+                "endpoint_url": os.environ.get("BUCKET_ENDPOINT"),
                 "use_ssl": True,
             }
         },
@@ -190,12 +189,15 @@ if USE_S3:
     }
     
     # Custom Domain
-    AWS_S3_CUSTOM_DOMAIN = f"{os.environ.get('BUCKET_NAME')}.{os.environ.get('BUCKET_ENDPOINT').split('//')[1]}" if os.environ.get('BUCKET_ENDPOINT') else None
+    AWS_S3_CUSTOM_DOMAIN = f"{os.environ.get('BUCKET_NAME')}.{os.environ.get('BUCKET_ENDPOINT').split('//')[1]}" if os.environ.get('BUCKET_ENDPOINT') and '//' in os.environ.get('BUCKET_ENDPOINT') else None
     
     if AWS_S3_CUSTOM_DOMAIN and not ('r2.cloudflarestorage.com' in str(os.environ.get('BUCKET_ENDPOINT'))):
          MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
     else:
-         MEDIA_URL = f"{os.environ.get('BUCKET_ENDPOINT')}/{os.environ.get('BUCKET_NAME')}/"
+         endpoint = os.environ.get('BUCKET_ENDPOINT', '')
+         if endpoint and not endpoint.endswith('/'):
+             endpoint += '/'
+         MEDIA_URL = f"{endpoint}{os.environ.get('BUCKET_NAME')}/"
 
 else:
     MEDIA_URL = '/uploads/'
