@@ -15,13 +15,9 @@ def run_single_strategy(strategy_id):
     Used for manual triggers via UI.
     """
     try:
-        # Fetch the strategy, log if it doesn't exist to prevent Celery crashes
-        try:
-            strategy = ContentStrategy.objects.get(id=strategy_id)
-        except ContentStrategy.DoesNotExist:
-            logger.error(f"Error in manual strategy run: ContentStrategy with ID {strategy_id} does not exist.")
-            return f"Error: ContentStrategy {strategy_id} not found."
-
+        # We catch the broad Exception from the previous iteration that was returning the string
+        # 'ContentStrategy matching query does not exist.' as a successful result string.
+        strategy = ContentStrategy.objects.get(id=strategy_id)
         now = timezone.now()
         
         logger.info(f"Manual trigger: Starting AI Pipeline for strategy: {strategy.title}")
@@ -50,9 +46,15 @@ def run_single_strategy(strategy_id):
         strategy.save()
         
         return f"Success: Strategy {strategy.title} executed."
+    except ContentStrategy.DoesNotExist:
+        err_msg = f"Error: ContentStrategy with ID {strategy_id} does not exist."
+        logger.error(err_msg)
+        # Raising the error so Celery actually marks the task as FAILED instead of SUCCESS
+        raise ValueError(err_msg)
     except Exception as e:
         logger.error(f"Error in manual strategy run: {str(e)}")
-        return str(e)
+        # Raising so it doesn't return a string and appear as "succeeded" in logs
+        raise e
 
 @shared_task
 def run_content_strategies():
