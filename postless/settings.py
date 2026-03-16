@@ -174,19 +174,19 @@ if USE_S3:
         "default": {
             "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
             "OPTIONS": {
-                "AWS_ACCESS_KEY_ID": os.environ.get("BUCKET_ACCESS_KEY"),
-                "AWS_SECRET_ACCESS_KEY": os.environ.get("BUCKET_SECRET_KEY"),
-                "AWS_STORAGE_BUCKET_NAME": os.environ.get("BUCKET_NAME"),
-                "AWS_S3_REGION_NAME": os.environ.get("BUCKET_REGION"),
-                "AWS_S3_ENDPOINT_URL": os.environ.get("BUCKET_ENDPOINT"),
-                "AWS_S3_USE_SSL": True,
+                "access_key": os.environ.get("BUCKET_ACCESS_KEY"),
+                "secret_key": os.environ.get("BUCKET_SECRET_KEY"),
+                "bucket_name": os.environ.get("BUCKET_NAME"),
+                "region_name": os.environ.get("BUCKET_REGION"),
+                "endpoint_url": os.environ.get("BUCKET_ENDPOINT"),
             }
         },
         "staticfiles": {
             "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
         },
     }
-    
+
+
     # Custom Domain
     AWS_S3_CUSTOM_DOMAIN = f"{os.environ.get('BUCKET_NAME')}.{os.environ.get('BUCKET_ENDPOINT').split('//')[1]}" if os.environ.get('BUCKET_ENDPOINT') and '//' in os.environ.get('BUCKET_ENDPOINT') else None
     
