@@ -14,6 +14,8 @@ def run_single_strategy(strategy_id):
     Executes a single strategy immediately.
     Used for manual triggers via UI.
     """
+    logger.info(f"Task received with strategy_id: {strategy_id}, type: {type(strategy_id)}")
+
     try:
         # We catch the broad Exception from the previous iteration that was returning the string
         # 'ContentStrategy matching query does not exist.' as a successful result string.
