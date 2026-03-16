@@ -208,6 +208,7 @@ AUTH_USER_MODEL = 'users.User'
 REDIS_URL = os.environ.get("REDIS_URL", "redis://Redis.REDIS_URL/0")
 
 # Celery Configuration
+from celery.schedules import crontab
 CELERY_BROKER_URL = REDIS_URL
 CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_ACCEPT_CONTENT = ['json']
@@ -249,14 +250,13 @@ OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', 'sk-proj-5GVXFqavTm3TN4rXdVI9_
 RUNWAYML_API_KEY = os.environ.get('RUNWAYML_API_KEY', 'key_76eb6d620d1a890cd99712eeae233911dbea878d437209e19735b6b6863f1bfd75d3b1e1d83f26ccd4e18163b49be6abef4d8c1b1803687316104d3f2d4d2934')
 
 # Celery Beat Schedule
-from celery.schedules import crontab
 CELERY_BEAT_SCHEDULE = {
-    "check-scheduled-posts-every-minute": {
+    "CHECK_SCHEDULED_POSTS_EVERY_MINUTE": {
         "task": "publishing.tasks.process_scheduled_posts",
         "schedule": 60.0,
     },
-    "run-content-strategies-every-hour": {
-        "task": "ai_generation.tasks.run_content_strategies",
+    "CHECK_AUTOMATION_STRATEGIES_HOURLY": {
+        "task": "ai_generation.tasks.check_automation_strategies",
         "schedule": crontab(minute=0), # Every hour
     },
 }
