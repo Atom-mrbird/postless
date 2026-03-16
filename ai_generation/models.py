@@ -10,7 +10,7 @@ class AIPrompt(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.prompt_text[:20]}"
 
-class AutomationStrategy(models.Model):
+class ContentStrategy(models.Model):
     FREQUENCY_CHOICES = [
         ('daily', 'Daily'),
         ('weekly', 'Weekly'),
@@ -27,7 +27,7 @@ class AutomationStrategy(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='automation_strategies')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=100, help_text="Strategy Name (e.g., Daily Cat Facts)")
     concept_prompt = models.TextField(help_text="The core concept for AI generation")
     platform = models.CharField(max_length=20, choices=PLATFORM_CHOICES)
@@ -37,12 +37,10 @@ class AutomationStrategy(models.Model):
     is_active = models.BooleanField(default=True)
     last_run_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "Automation Strategy"
-        verbose_name_plural = "Automation Strategies"
-        ordering = ['-created_at']
+        verbose_name = "Content Strategy"
+        verbose_name_plural = "Content Strategies"
 
     def __str__(self):
         return f"{self.title} - {self.user.username} ({self.get_frequency_display()})"
