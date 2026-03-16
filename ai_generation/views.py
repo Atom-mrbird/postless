@@ -54,6 +54,12 @@ def automation_page(request):
         
         elif action == 'toggle':
             strategy_id = request.POST.get('strategy_id')
+            try:
+                strategy_id = int(strategy_id)
+            except (ValueError, TypeError):
+                messages.error(request, 'Geçersiz strateji ID.')
+                return redirect('automation')
+                
             strategy = get_object_or_404(ContentStrategy, id=strategy_id, user=request.user)
             strategy.is_active = not strategy.is_active
             strategy.save()

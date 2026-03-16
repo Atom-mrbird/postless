@@ -17,11 +17,13 @@ def run_single_strategy(self, strategy_id):
     logger.info(f"Task received with strategy_id: {strategy_id}, type: {type(strategy_id)}")
 
     try:
-        try:
-            strategy_id = int(strategy_id)
-        except (ValueError, TypeError):
-            logger.warning(f"strategy_id {strategy_id} could not be converted to int")
-            raise ContentStrategy.DoesNotExist(f"Invalid strategy_id: {strategy_id}")
+        # Ensure strategy_id is an integer if it's passed as a string
+        if isinstance(strategy_id, str):
+            try:
+                strategy_id = int(strategy_id)
+            except (ValueError, TypeError):
+                logger.warning(f"strategy_id {strategy_id} could not be converted to int")
+                return f"Error: Invalid strategy_id: {strategy_id}"
 
         strategy = ContentStrategy.objects.filter(id=strategy_id).first()
 
