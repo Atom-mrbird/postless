@@ -1,6 +1,6 @@
 from celery import shared_task
 from django.utils import timezone
-from .models import ContentStrategy
+from .models import AutomationStrategy
 from scheduling.models import Schedule
 from .services import generate_and_save_content
 import datetime
@@ -19,7 +19,7 @@ def run_single_strategy(self, strategy_id):
     
     try:
         # Strategy fetching with error handling
-        strategy = ContentStrategy.objects.filter(id=strategy_id).first()
+        strategy = AutomationStrategy.objects.filter(id=strategy_id).first()
         if not strategy:
             logger.error(f"[Automation] Strategy {strategy_id} not found.")
             return f"Error: Strategy {strategy_id} not found."
@@ -86,7 +86,7 @@ def check_automation_strategies():
     Periodic task to check which strategies need to run.
     """
     now = timezone.now()
-    active_strategies = ContentStrategy.objects.filter(is_active=True)
+    active_strategies = AutomationStrategy.objects.filter(is_active=True)
     
     results = []
     for strategy in active_strategies:
