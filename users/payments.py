@@ -44,15 +44,15 @@ def create_checkout_form(user, request):
             'name': 'Postless Pro Subscription',
             'category1': 'SaaS',
             'itemType': 'VIRTUAL',
-            'price': '500.00'
+            'price': '499.99'
         }
     ]
 
     request_data = {
         'locale': 'tr',
         'conversationId': f'conv_{user.id}',
-        'price': '500.00',
-        'paidPrice': '500.00',
+        'price': '499.99',
+        'paidPrice': '499.99',
         'currency': 'TRY',
         'basketId': f'B_{user.id}',
         'paymentGroup': 'PRODUCT',
