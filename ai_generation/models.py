@@ -10,7 +10,7 @@ class AIPrompt(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.prompt_text[:20]}"
 
-class ContentStrategy(models.Model):
+class AutomationStrategy(models.Model):
     FREQUENCY_CHOICES = [
         ('daily', 'Daily'),
         ('weekly', 'Weekly'),
@@ -39,8 +39,8 @@ class ContentStrategy(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = "Content Strategy"
-        verbose_name_plural = "Content Strategies"
+        verbose_name = "Automation Strategy"
+        verbose_name_plural = "Automation Strategies"
 
     def __str__(self):
         return f"{self.title} - {self.user.username} ({self.get_frequency_display()})"
