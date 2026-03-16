@@ -174,12 +174,12 @@ if USE_S3:
         "default": {
             "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
             "OPTIONS": {
-                "ACCESS_KEY": os.environ.get("BUCKET_ACCESS_KEY"),
-                "SECRET_KEY": os.environ.get("BUCKET_SECRET_KEY"),
-                "STORAGE_BUCKET_NAME": os.environ.get("BUCKET_NAME"),
-                "S3_REGION_NAME": os.environ.get("BUCKET_REGION"),
-                "S3_ENDPOINT_URL": os.environ.get("BUCKET_ENDPOINT"),
-                "S3_USE_SSL": True,
+                "AWS_ACCESS_KEY_ID": os.environ.get("BUCKET_ACCESS_KEY"),
+                "AWS_SECRET_ACCESS_KEY": os.environ.get("BUCKET_SECRET_KEY"),
+                "AWS_STORAGE_BUCKET_NAME": os.environ.get("BUCKET_NAME"),
+                "AWS_S3_REGION_NAME": os.environ.get("BUCKET_REGION"),
+                "AWS_S3_ENDPOINT_URL": os.environ.get("BUCKET_ENDPOINT"),
+                "AWS_S3_USE_SSL": True,
             }
         },
         "staticfiles": {
