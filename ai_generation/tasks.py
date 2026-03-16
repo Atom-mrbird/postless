@@ -8,8 +8,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-@shared_task(bind=True, max_retries=3)
-def run_single_strategy(self, strategy_id):
+@shared_task
+def run_single_strategy(strategy_id):
     """
     Executes a single strategy immediately.
     Used for manual triggers via UI.
@@ -58,11 +58,10 @@ def run_single_strategy(self, strategy_id):
     except ContentStrategy.DoesNotExist as e:
         err_msg = f"Error: ContentStrategy with ID {strategy_id} does not exist."
         logger.error(err_msg)
-        # Re-raising the exception for Celery to handle it properly (retry/mark as failed)
-        raise self.retry(exc=e, countdown=5) # Retry after 5 seconds
+        raise e
     except Exception as e:
         logger.error(f"Error in manual strategy run: {str(e)}")
-        raise self.retry(exc=e, countdown=5) # Retry after 5 seconds
+        raise e
 
 @shared_task
 def run_content_strategies():
