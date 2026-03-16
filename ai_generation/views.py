@@ -90,8 +90,8 @@ def run_strategy_now(request, id):
     strategy = get_object_or_404(AutomationStrategy, id=id, user=request.user)
     
     # Trigger Celery task
-    from .tasks import run_single_strategy
-    run_single_strategy.delay(str(strategy.id))
+    from .tasks import run_single_automation
+    run_single_automation.delay(str(strategy.id))
     
     messages.success(request, f'"{strategy.title}" arka planda başlatıldı. İçerik üretilip planlanacaktır.')
     return redirect('automation')
