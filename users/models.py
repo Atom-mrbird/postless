@@ -33,7 +33,7 @@ class Subscription(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='trial')
     trial_end = models.DateTimeField(null=True, blank=True)
     current_period_end = models.DateTimeField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now)
 
     def save(self, *args, **kwargs):
         if self.status == 'trial' and not self.trial_end:
