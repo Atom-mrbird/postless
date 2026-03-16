@@ -27,8 +27,14 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-vf*0g94mj7j_m$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['www.postless.solutions','postless.solutions', 'localhost', '127.0.0.1']
-
+ALLOWED_HOSTS = [
+    'www.postless.solutions',
+    'postless.solutions',
+    'localhost',
+    '127.0.0.1',
+    'postless.railway.internal',
+    os.environ.get('RAILWAY_PUBLIC_DOMAIN', ''),
+]
 CSRF_TRUSTED_ORIGINS = [
     'https://postless.solutions',
     'https://www.postless.solutions'
