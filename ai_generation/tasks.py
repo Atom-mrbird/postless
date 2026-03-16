@@ -1,6 +1,6 @@
 from celery import shared_task
 from django.utils import timezone
-from .models import AutomationStrategy
+from .models import ContentStrategy
 from scheduling.models import Schedule
 from .services import generate_and_save_content
 import datetime
@@ -10,7 +10,7 @@ import traceback
 logger = logging.getLogger(__name__)
 
 @shared_task(bind=True, max_retries=3)
-def run_single_automation(self, strategy_id):
+def run_single_strategy(self, strategy_id):
     """
     Executes a single automation strategy.
     Called manually from UI or by the hourly periodic task.
@@ -19,7 +19,7 @@ def run_single_automation(self, strategy_id):
     
     try:
         # Strategy fetching with error handling
-        strategy = AutomationStrategy.objects.filter(id=strategy_id).first()
+        strategy = ContentStrategy.objects.filter(id=strategy_id).first()
         if not strategy:
             logger.error(f"[Automation] Strategy {strategy_id} not found.")
             return f"Error: Strategy {strategy_id} not found."
@@ -69,6 +69,7 @@ def run_single_automation(self, strategy_id):
             return f"Error: Scheduling failed: {str(sched_err)}"
 
         # 3. UPDATE STRATEGY
+        strategy.is_active = True
         strategy.last_run_at = now
         strategy.save()
 
@@ -85,7 +86,7 @@ def check_automation_strategies():
     Periodic task to check which strategies need to run.
     """
     now = timezone.now()
-    active_strategies = AutomationStrategy.objects.filter(is_active=True)
+    active_strategies = ContentStrategy.objects.filter(is_active=True)
     
     results = []
     for strategy in active_strategies:
@@ -122,7 +123,7 @@ def check_automation_strategies():
                 
                 if not duplicate:
                     logger.info(f"[Automation] Triggering automated run for: {strategy.title}")
-                    run_single_automation.delay(str(strategy.id))
+                    run_single_strategy.delay(str(strategy.id))
                     results.append(f"Triggered: {strategy.title}")
                 else:
                     # Mark as run to avoid re-triggering today
