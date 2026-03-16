@@ -15,4 +15,4 @@ class AutomationStrategyAdmin(admin.ModelAdmin):
     list_filter = ('platform', 'content_type', 'frequency', 'is_active')
     search_fields = ('title', 'user__username', 'concept_prompt')
     ordering = ('-created_at',)
-    readonly_fields = ('id', 'last_run_at', 'created_at', 'updated_at')
+    readonly_fields = ('last_run_at', 'created_at', 'updated_at')
