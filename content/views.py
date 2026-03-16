@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from .models import Content
 from .serializers import ContentSerializer
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
@@ -44,9 +44,9 @@ def content_page(request):
                     file=file,
                     content_type=content_type
                 )
-                messages.success(request, 'File uploaded successfully!')
+                messages.success(request, 'İçerik başarıyla yüklendi!')
             except Exception as e:
-                messages.error(request, f'Upload failed: {str(e)}')
+                messages.error(request, f'Yükleme başarısız: {str(e)}')
         return redirect('content')
 
     # Handle Filtering
@@ -58,12 +58,25 @@ def content_page(request):
     elif filter_type == 'videos':
         contents = contents.filter(content_type='video')
     elif filter_type == 'ai':
-        contents = contents.filter(title__startswith='AI Generated')
+        contents = contents.filter(title__startswith='Auto:') | contents.filter(title__startswith='AI Generated')
 
     return render(request, 'content.html', {
         'contents': contents,
         'active_filter': filter_type
     })
+
+@login_required
+@subscription_required
+def delete_content(request, id):
+    if request.method == 'POST':
+        content = get_object_or_404(Content, id=id, user=request.user)
+        try:
+            content.file.delete(save=False) # Delete the actual file from storage
+            content.delete() # Delete the db record
+            messages.success(request, 'İçerik başarıyla silindi.')
+        except Exception as e:
+            messages.error(request, f'İçerik silinirken hata oluştu: {str(e)}')
+    return redirect('content')
 
 @login_required
 @subscription_required

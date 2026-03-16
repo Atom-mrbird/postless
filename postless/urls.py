@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from content.views import content_page, dashboard_view
+from content.views import content_page, delete_content, dashboard_view
 from scheduling.views import schedule_page, edit_schedule
 from users.views import connections_page, disconnect_account, settings_page, pricing_page, iyzico_payment_init, iyzico_payment_callback, instagram_webhook
 from ai_generation.views import ai_generator_page, automation_page, delete_strategy, run_strategy_now, generate_content, save_generated_content
@@ -17,6 +17,7 @@ urlpatterns = [
     path('schedule/', schedule_page, name='schedule'),
     path('schedule/edit/<int:id>/', edit_schedule, name='edit_schedule'),
     path('content/', content_page, name='content'),
+    path('content/delete/<int:id>/', delete_content, name='delete_content'),
     path('connections/', connections_page, name='connections'),
     path('connections/disconnect/<str:platform>/', disconnect_account, name='disconnect_account'),
     path('settings/', settings_page, name='settings'),

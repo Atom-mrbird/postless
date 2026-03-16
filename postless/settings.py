@@ -148,8 +148,21 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-MEDIA_URL = '/uploads/'
-MEDIA_ROOT = BASE_DIR / '/uploads/uploads'
+if os.environ.get('BUCKET_NAME'):
+    # S3 Configuration
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    AWS_STORAGE_BUCKET_NAME = os.environ.get('BUCKET_NAME')
+    AWS_S3_REGION_NAME = os.environ.get('BUCKET_REGION')
+    AWS_S3_ENDPOINT_URL = os.environ.get('BUCKET_ENDPOINT')
+    AWS_ACCESS_KEY_ID = os.environ.get('BUCKET_ACCESS_KEY')
+    AWS_SECRET_ACCESS_KEY = os.environ.get('BUCKET_SECRET_KEY')
+    AWS_S3_CUSTOM_DOMAIN = f"{os.environ.get('BUCKET_NAME')}.{os.environ.get('BUCKET_ENDPOINT').split('//')[1]}"
+    AWS_S3_USE_SSL = True
+    AWS_QUERYSTRING_AUTH = False  # Public URLs
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
+else:
+    MEDIA_URL = '/uploads/'
+    MEDIA_ROOT = BASE_DIR / '/uploads/uploads'
 
 AUTH_USER_MODEL = 'users.User'
 
