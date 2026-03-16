@@ -24,10 +24,10 @@ def run_single_strategy(self, strategy_id):
             raise ContentStrategy.DoesNotExist(f"Invalid strategy_id: {strategy_id}")
 
         strategy = ContentStrategy.objects.filter(id=strategy_id).first()
+
         if not strategy:
-            err_msg = f"Error: ContentStrategy with ID {strategy_id} does not exist."
-            logger.error(err_msg)
-            return err_msg
+            logger.error(f"Strategy id {strategy_id} not found")
+            return f"Strategy {strategy_id} not found"
         now = timezone.now()
 
         logger.info(f"Manual trigger: Starting AI Pipeline for strategy: {strategy.title}")
