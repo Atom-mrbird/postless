@@ -32,6 +32,9 @@ class Subscription(models.Model):
     stripe_subscription_id = models.CharField(max_length=255, blank=True, null=True)
     is_active = models.CharField(max_length=10, choices=STATUS_CHOICES, default='trial')
     end_date = models.DateTimeField(null=True, blank=True)
+    plan_name = models.CharField(max_length=255, blank=True, null=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='trial')
+    trial_end = models.DateTimeField(null=True, blank=True)
     current_period_end = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
 
