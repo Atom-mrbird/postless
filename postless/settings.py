@@ -36,7 +36,7 @@ CSRF_TRUSTED_ORIGINS = [
     'https://postless.solutions',
     'https://www.postless.solutions'
 ]
-
+APPEND_SLASH=False
 # Session and Cookie Settings for Ngrok/HTTPS
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_COOKIE_SECURE = not DEBUG
