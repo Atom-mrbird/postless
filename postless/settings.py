@@ -30,10 +30,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'www.postless.solutions',
     'postless.solutions',
-    'localhost',
-    '127.0.0.1',
-    'postless.railway.internal',
-    os.environ.get('RAILWAY_PUBLIC_DOMAIN', ''),
+    'squid-app-8fvn9.ondigitalocean.app',
 ]
 CSRF_TRUSTED_ORIGINS = [
     'https://postless.solutions',
