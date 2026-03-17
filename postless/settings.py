@@ -29,13 +29,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'www.postless.solutions',
-    'postless.solutions',
-    'squid-app-8fvn9.ondigitalocean.app',
+    'postless.solutions'
 ]
 CSRF_TRUSTED_ORIGINS = [
     'https://postless.solutions',
-    'https://www.postless.solutions',
-    'https://squid-app-8fvn9.ondigitalocean.app'
+    'https://www.postless.solutions'
 ]
 APPEND_SLASH=False
 # Session and Cookie Settings for Ngrok/HTTPS
