@@ -60,6 +60,19 @@ def automation_page(request):
             else:
                 messages.error(request, 'Lütfen tüm alanları doldurun.')
         
+        elif action == 'edit':
+            strategy_id = request.POST.get('strategy_id')
+            strategy = get_object_or_404(AutomationStrategy, id=strategy_id, user=request.user)
+            
+            strategy.title = request.POST.get('title')
+            strategy.concept_prompt = request.POST.get('concept_prompt')
+            strategy.platform = request.POST.get('platform')
+            strategy.content_type = request.POST.get('content_type')
+            strategy.frequency = request.POST.get('frequency')
+            strategy.time_of_day = request.POST.get('time_of_day')
+            strategy.save()
+            messages.success(request, f'"{strategy.title}" stratejisi güncellendi.')
+
         elif action == 'toggle':
             strategy_id = request.POST.get('strategy_id')
             strategy = get_object_or_404(AutomationStrategy, id=strategy_id, user=request.user)

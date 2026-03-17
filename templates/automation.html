@@ -26,19 +26,20 @@
             </button>
         </div>
         
-        <form method="POST" class="space-y-8">
+        <form method="POST" class="space-y-8" id="strategyFormElement">
             {% csrf_token %}
-            <input type="hidden" name="action" value="create">
+            <input type="hidden" name="action" id="formAction" value="create">
+            <input type="hidden" name="strategy_id" id="formStrategyId" value="">
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="space-y-2">
                     <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Strateji Adı</label>
-                    <input type="text" name="title" required placeholder="Örn: Günlük Teknoloji Haberleri" 
+                    <input type="text" name="title" id="formTitle" required placeholder="Örn: Günlük Teknoloji Haberleri" 
                            class="w-full rounded-xl border-gray-300 bg-gray-50 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700/50 dark:border-gray-600 dark:text-white transition-all">
                 </div>
                 <div class="space-y-2">
                     <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Hedef Platform</label>
-                    <select name="platform" required 
+                    <select name="platform" id="formPlatform" required 
                             class="w-full rounded-xl border-gray-300 bg-gray-50 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700/50 dark:border-gray-600 dark:text-white transition-all">
                         <option value="Instagram">Instagram</option>
                         <option value="YouTube">YouTube</option>
@@ -48,7 +49,7 @@
 
             <div class="space-y-2">
                 <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">İçerik Konsepti (Yapay Zeka Promptu)</label>
-                <textarea name="concept_prompt" required rows="4" 
+                <textarea name="concept_prompt" id="formConceptPrompt" required rows="4" 
                           placeholder="Yapay zekanın ne tür içerikler üretmesini istiyorsunuz? Örn: 'Modern mimari ve minimalist ev tasarımları hakkında ilham verici görseller'" 
                           class="w-full rounded-xl border-gray-300 bg-gray-50 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700/50 dark:border-gray-600 dark:text-white transition-all"></textarea>
                 <div class="flex items-start gap-2 mt-2 text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg">
@@ -60,7 +61,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div class="space-y-2">
                     <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">İçerik Türü</label>
-                    <select name="content_type" required 
+                    <select name="content_type" id="formContentType" required 
                             class="w-full rounded-xl border-gray-300 bg-gray-50 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700/50 dark:border-gray-600 dark:text-white transition-all">
                         <option value="image">Görsel (DALL-E 3)</option>
                         <option value="video">Video (Sora/Runway)</option>
@@ -68,7 +69,7 @@
                 </div>
                 <div class="space-y-2">
                     <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Paylaşım Sıklığı</label>
-                    <select name="frequency" required 
+                    <select name="frequency" id="formFrequency" required 
                             class="w-full rounded-xl border-gray-300 bg-gray-50 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700/50 dark:border-gray-600 dark:text-white transition-all">
                         <option value="daily">Her Gün</option>
                         <option value="weekly">Haftada Bir</option>
@@ -76,15 +77,15 @@
                 </div>
                 <div class="space-y-2">
                     <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Paylaşım Saati</label>
-                    <input type="time" name="time_of_day" required 
+                    <input type="time" name="time_of_day" id="formTimeOfDay" required 
                            class="w-full rounded-xl border-gray-300 bg-gray-50 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700/50 dark:border-gray-600 dark:text-white [color-scheme:light] dark:[color-scheme:dark]">
                 </div>
             </div>
 
             <div class="pt-6 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-4">
-                <button type="button" onclick="document.getElementById('strategyForm').classList.add('hidden')" 
+                <button type="button" onclick="resetForm(); document.getElementById('strategyForm').classList.add('hidden')" 
                         class="px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-colors dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">İptal</button>
-                <button type="submit" 
+                <button type="submit" id="formSubmitBtn" 
                         class="px-8 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg hover:shadow-indigo-500/25">
                     Stratejiyi Başlat
                 </button>
@@ -169,6 +170,13 @@
                         </button>
                     </form>
 
+                    <!-- Edit Action (Triggers Form with Pre-filled Data) -->
+                    <button onclick="editStrategy('{{ strategy.id }}', '{{ strategy.title|escapejs }}', '{{ strategy.platform|escapejs }}', '{{ strategy.concept_prompt|escapejs }}', '{{ strategy.content_type|escapejs }}', '{{ strategy.frequency|escapejs }}', '{{ strategy.time_of_day|time:'H:i' }}')" 
+                            class="p-2.5 bg-white border border-gray-200 rounded-xl text-blue-600 hover:bg-blue-50 hover:border-blue-200 transition-all shadow-sm dark:bg-gray-800 dark:border-gray-600" 
+                            title="Düzenle">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </button>
+
                     <!-- Delete Action -->
                     <form method="POST" action="{% url 'delete_strategy' strategy.id %}" onsubmit="return confirm('Bu otomasyon stratejisini silmek istediğinizden emin misiniz?');">
                         {% csrf_token %}
@@ -196,4 +204,27 @@
         {% endfor %}
     </div>
 </div>
+
+<script>
+function editStrategy(id, title, platform, prompt, contentType, frequency, timeOfDay) {
+    document.getElementById('strategyForm').classList.remove('hidden');
+    document.getElementById('formAction').value = 'edit';
+    document.getElementById('formStrategyId').value = id;
+    document.getElementById('formTitle').value = title;
+    document.getElementById('formPlatform').value = platform;
+    document.getElementById('formConceptPrompt').value = prompt;
+    document.getElementById('formContentType').value = contentType;
+    document.getElementById('formFrequency').value = frequency;
+    document.getElementById('formTimeOfDay').value = timeOfDay;
+    document.getElementById('formSubmitBtn').innerText = 'Değişiklikleri Kaydet';
+    document.getElementById('strategyForm').scrollIntoView({ behavior: 'smooth' });
+}
+
+function resetForm() {
+    document.getElementById('formAction').value = 'create';
+    document.getElementById('formStrategyId').value = '';
+    document.getElementById('strategyFormElement').reset();
+    document.getElementById('formSubmitBtn').innerText = 'Stratejiyi Başlat';
+}
+</script>
 {% endblock %}
