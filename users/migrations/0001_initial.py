@@ -67,9 +67,9 @@ class Migration(migrations.Migration):
                 ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='subscription', to=settings.AUTH_USER_MODEL)),
             ],
         ),
-                migrations.RenameField(
-    model_name='subscription',
-    old_name='end_date',
-    new_name='current_period_end',
+        migrations.RenameField(
+            model_name='subscription',
+            old_name='end_date',
+            new_name='current_period_end',
 )
     ]
