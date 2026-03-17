@@ -2,7 +2,7 @@ import os
 import shutil
 
 apps = ['users', 'ai_generation']
-base_dir = '/Users/atomsolutionsoftware/PycharmProjects/postless'
+base_dir = '/'
 
 for app in apps:
     migrations_dir = os.path.join(base_dir, app, 'migrations')
