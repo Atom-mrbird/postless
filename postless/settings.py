@@ -30,22 +30,18 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'www.postless.solutions',
     'postless.solutions',
-    'localhost',
-    '127.0.0.1',
-    'postless.railway.internal',
-    os.environ.get('RAILWAY_PUBLIC_DOMAIN', ''),
+    'squid-app-8fvn9.ondigitalocean.app',
 ]
 CSRF_TRUSTED_ORIGINS = [
     'https://postless.solutions',
-    'https://www.postless.solutions'
+    'https://www.postless.solutions',
+    'https://squid-app-8fvn9.ondigitalocean.app'
 ]
-
+APPEND_SLASH=False
 # Session and Cookie Settings for Ngrok/HTTPS
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-SESSION_COOKIE_SECURE = not DEBUG
-SESSION_COOKIE_SAMESITE = 'None'
-CSRF_COOKIE_SECURE = not DEBUG
-CSRF_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
@@ -202,7 +198,7 @@ else:
 AUTH_USER_MODEL = 'users.User'
 
 # Fallback to local Redis if the environment variable is not set
-REDIS_URL = os.environ.get("REDIS_URL", "redis://Redis.REDIS_URL/0")
+REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
 
 # Celery Configuration
 from celery.schedules import crontab
