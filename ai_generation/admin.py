@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import AIPrompt, AutomationStrategy
+from .models import AIPrompt
 
 @admin.register(AIPrompt)
 class AIPromptAdmin(admin.ModelAdmin):
