@@ -29,7 +29,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'www.postless.solutions',
-    'postless.solutions'
+    'postless.solutions',
+    'urchin-app-dqni8.ondigitalocean.app'
 ]
 CSRF_TRUSTED_ORIGINS = [
     'https://postless.solutions',
