@@ -15,7 +15,7 @@ class SubscriptionMiddleware:
         exempt_paths = [
             reverse('admin:index'),
             '/accounts/', # Covers login, logout, signup
-            '/users/payment/', # Your payment/pricing page
+            '/pricing/',
             '/static/',
             '/uploads/',
         ]
@@ -35,6 +35,6 @@ class SubscriptionMiddleware:
             if not subscription or not subscription.is_active_or_trial:
                 messages.warning(request, "Sistemi kullanmak için aktif bir aboneliğiniz olmalıdır.")
                 # Redirect to your payment or pricing view
-                return redirect('/users/payment/')
+                return redirect('/pricing/')
 
         return self.get_response(request)

@@ -29,13 +29,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'www.postless.solutions',
-    'postless.solutions',
-    'squid-app-8fvn9.ondigitalocean.app',
+    'postless.solutions'
 ]
 CSRF_TRUSTED_ORIGINS = [
     'https://postless.solutions',
-    'https://www.postless.solutions',
-    'https://squid-app-8fvn9.ondigitalocean.app'
+    'https://www.postless.solutions'
 ]
 APPEND_SLASH=False
 # Session and Cookie Settings for Ngrok/HTTPS
@@ -108,23 +106,19 @@ IYZICO_CALLBACK_URL = 'https://www.postless.solutions/users/payment/callback/'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASE_URL = os.environ.get('DATABASE_URL')
-if DATABASE_URL:
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=DATABASE_URL,
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'db',  # verdiğin database
+        'USER': 'db',  # verdiğin username
+        'PASSWORD': 'AVNS_kj9z33rUw0vsBSloo3e',
+        'HOST': 'app-bd606cdd-0359-4572-a801-a167e60e9940-do-user-34680255-0.k.db.ondigitalocean.com',
+        'PORT': '25060',
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
     }
-else:
-    # Use SQLite for local development or if PostgreSQL URL is missing
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+}
 
 
 # Password validation

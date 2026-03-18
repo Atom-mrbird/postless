@@ -1,11 +1,12 @@
 import os
-import shutil
 
 apps = ['users', 'ai_generation']
-base_dir = '/Users/atomsolutionsoftware/PycharmProjects/postless'
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 for app in apps:
-    migrations_dir = os.path.join(base_dir, app, 'migrations')
+    migrations_dir = os.path.join(BASE_DIR, app, 'migrations')
+    
     if os.path.exists(migrations_dir):
         for filename in os.listdir(migrations_dir):
             if filename != '__init__.py' and filename.endswith('.py'):
