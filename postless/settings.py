@@ -106,19 +106,27 @@ IYZICO_CALLBACK_URL = 'https://www.postless.solutions/users/payment/callback/'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'db',  # verdiğin database
-        'USER': 'db',  # verdiğin username
-        'PASSWORD': 'AVNS_kj9z33rUw0vsBSloo3e',
-        'HOST': 'app-bd606cdd-0359-4572-a801-a167e60e9940-do-user-34680255-0.k.db.ondigitalocean.com',
-        'PORT': '25060',
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'db',  # verdiğin database
+            'USER': 'db',  # verdiğin username
+            'PASSWORD': 'AVNS_kj9z33rUw0vsBSloo3e',
+            'HOST': 'app-bd606cdd-0359-4572-a801-a167e60e9940-do-user-34680255-0.k.db.ondigitalocean.com',
+            'PORT': '25060',
+            'OPTIONS': {
+                'sslmode': 'require',
+            },
+        }
+    }
 
 
 # Password validation
