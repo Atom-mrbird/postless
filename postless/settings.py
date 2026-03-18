@@ -35,6 +35,7 @@ ALLOWED_HOSTS = [
 CSRF_TRUSTED_ORIGINS = [
     'https://postless.solutions',
     'https://www.postless.solutions'
+    'urchin-app-dqni8.ondigitalocean.app'
 ]
 APPEND_SLASH=False
 # Session and Cookie Settings for Ngrok/HTTPS
