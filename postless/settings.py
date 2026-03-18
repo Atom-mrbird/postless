@@ -43,7 +43,10 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
+SESSION_COOKIE_DOMAIN = '.postless.solutions'
+CSRF_COOKIE_DOMAIN = '.postless.solutions'
+SESSION_COOKIE_AGE = 2592000  # 30 days
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 # Application definition
 
 INSTALLED_APPS = [
