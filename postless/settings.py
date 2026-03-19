@@ -102,10 +102,10 @@ WSGI_APPLICATION = 'postless.wsgi.application'
 ASGI_APPLICATION = 'postless.asgi.application'
 
 
-"""IYZICO_API_KEY = os.environ.get('IYZICO_API_KEY', 'sandbox-A51P519o6I1L9q5y2Q0A5Y7V6X4J8u3w')
+IYZICO_API_KEY = os.environ.get('IYZICO_API_KEY', 'sandbox-A51P519o6I1L9q5y2Q0A5Y7V6X4J8u3w')
 IYZICO_SECRET_KEY = os.environ.get('IYZICO_SECRET_KEY', 'sandbox-S6v0L2J5q7V4w1O9n3B8M5X2U1G4k6e')
 IYZICO_BASE_URL = os.environ.get('IYZICO_BASE_URL', 'https://sandbox-api.iyzipay.com')
-IYZICO_CALLBACK_URL = 'https://www.postless.solutions/users/payment/callback/'"""
+IYZICO_CALLBACK_URL = 'https://www.postless.solutions/users/payment/callback/'
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
