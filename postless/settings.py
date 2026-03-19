@@ -34,7 +34,8 @@ ALLOWED_HOSTS = [
 ]
 CSRF_TRUSTED_ORIGINS = [
     'https://postless.solutions',
-    'https://www.postless.solutions'
+    'https://www.postless.solutions',
+    'https://plankton-app-wjaj8.ondigitalocean.app/'
 ]
 APPEND_SLASH=False
 # Session and Cookie Settings for Ngrok/HTTPS
