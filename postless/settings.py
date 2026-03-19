@@ -30,6 +30,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'www.postless.solutions',
     'postless.solutions',
+    'https://plankton-app-wjaj8.ondigitalocean.app'
 ]
 CSRF_TRUSTED_ORIGINS = [
     'https://postless.solutions',
