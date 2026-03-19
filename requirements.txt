@@ -5,6 +5,7 @@ redis
 upstash-redis
 psycopg2-binary
 dj-database-url
+python-dotenv
 stripe
 openai
 requests
