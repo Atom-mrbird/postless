@@ -1,6 +1,5 @@
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.contrib import messages
 
 class SubscriptionMiddleware:
     """
@@ -11,35 +10,27 @@ class SubscriptionMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
+        # TEMPORARILY DISABLED: Subscription restrictions are bypassed
         # 1. Define paths that are always accessible (Login, Signup, Admin, Static files)
-        exempt_paths = [
-            reverse('admin:index'),
-            '/accounts/', # Covers login, logout, signup
-            '/pricing/',
-            '/static/',
-            '/uploads/',
-        ]
+        # exempt_paths = [
+        #     reverse('admin:index'),
+        #     '/accounts/', # Covers login, logout, signup
+        #     '/pricing/',
+        #     '/static/',
+        #     '/uploads/',
+        # ]
 
-        path = request.path
-        if any(path.startswith(p) for p in exempt_paths):
-            return self.get_response(request)
+        # path = request.path
+        # if any(path.startswith(p) for p in exempt_paths):
+        #     return self.get_response(request)
 
         # 2. Check subscription for authenticated users
-        # users/middleware.py
+        # if request.user.is_authenticated:
+        #     if request.user.is_superuser:
+        #         return self.get_response(request)
 
-# ... önceki kısımlar ...
-        # 2. Check subscription for authenticated users
-        if request.user.is_authenticated:
-            if request.user.is_superuser:
-                return self.get_response(request)
-
-            # EĞER BURAYA GELİYORSA KULLANICI GİRİŞ YAPMIŞTIR
-            subscription = getattr(request.user, 'subscription', None)
-            if not subscription or not subscription.is_active_or_trial:
-                return redirect('/pricing/')
-        else:
-            # Kullanıcı giriş yapmamışsa abonelik kontrolü yapma, 
-            # bırak Django'nun kendi login_required dekoratörleri çalışsın.
-            pass 
+        #     subscription = getattr(request.user, 'subscription', None)
+        #     if not subscription or not subscription.is_active_or_trial:
+        #         return redirect('/pricing/')
 
         return self.get_response(request)
