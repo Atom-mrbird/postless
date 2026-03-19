@@ -4,7 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from content.views import content_page, delete_content, dashboard_view
 from scheduling.views import schedule_page, edit_schedule
-from users.views import connections_page, disconnect_account, settings_page, pricing_page, iyzico_payment_init, iyzico_payment_callback, instagram_webhook
+from users.views import connections_page, disconnect_account, settings_page, pricing_page, iyzico_payment_init, iyzico_payment_callback, instagram_webhook, feedback_page
 from ai_generation.views import ai_generator_page, automation_page, delete_strategy, run_strategy_now, generate_content, save_generated_content
 from django.views.generic import TemplateView
 
@@ -26,6 +26,7 @@ urlpatterns = [
     path('automation/', automation_page, name='automation'),
     path('automation/delete/<uuid:id>/', delete_strategy, name='delete_strategy'),
     path('automation/run/<uuid:id>/', run_strategy_now, name='run_strategy_now'),
+    path('feedback/', feedback_page, name='feedback'),
     
     # AI API Routes
     path('api/generate-content/', generate_content, name='generate_content'),

@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Geri Bildirim - Postless{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto py-10">
+
+    <div class="mb-8 text-center">
+        <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white">Geri Bildirim Verin</h1>
+        <p class="text-gray-500 mt-2 dark:text-gray-400">Postless'i geliştirmemize yardımcı olun. Fikirleriniz bizim için çok değerli!</p>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="mb-6 space-y-2">
+        {% for message in messages %}
+        <div class="p-4 rounded-xl border {% if message.tags == 'success' %}bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800{% else %}bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800{% endif %} flex items-center shadow-sm animate-fade-in">
+            <i class="fa-solid {% if message.tags == 'success' %}fa-circle-check{% else %}fa-circle-exclamation{% endif %} mr-3"></i>
+            <span class="text-sm font-medium">{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden dark:bg-gray-800 dark:border-gray-700">
+        <div class="p-8">
+            <form method="post" action="{% url 'feedback' %}">
+                {% csrf_token %}
+
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2 dark:text-gray-300">Geri Bildirim Türü</label>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <label class="relative flex items-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700 transition-colors">
+                                <input type="radio" name="feedback_type" value="feature" class="peer sr-only" required>
+                                <div class="w-5 h-5 border-2 border-gray-300 rounded-full peer-checked:border-primary peer-checked:border-4 mr-3 dark:border-gray-500 transition-all"></div>
+                                <span class="text-sm font-medium text-gray-900 dark:text-white">Yeni Özellik Önerisi</span>
+                            </label>
+
+                            <label class="relative flex items-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700 transition-colors">
+                                <input type="radio" name="feedback_type" value="bug" class="peer sr-only" required>
+                                <div class="w-5 h-5 border-2 border-gray-300 rounded-full peer-checked:border-red-500 peer-checked:border-4 mr-3 dark:border-gray-500 transition-all"></div>
+                                <span class="text-sm font-medium text-gray-900 dark:text-white">Hata Bildirimi</span>
+                            </label>
+
+                            <label class="relative flex items-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700 transition-colors">
+                                <input type="radio" name="feedback_type" value="other" class="peer sr-only" required>
+                                <div class="w-5 h-5 border-2 border-gray-300 rounded-full peer-checked:border-green-500 peer-checked:border-4 mr-3 dark:border-gray-500 transition-all"></div>
+                                <span class="text-sm font-medium text-gray-900 dark:text-white">Genel Yorum</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2 dark:text-gray-300">Mesajınız</label>
+                        <textarea name="message" rows="6" required placeholder="Lütfen düşüncelerinizi, karşılaştığınız sorunları veya eklenmesini istediğiniz özellikleri detaylıca yazın..." class="w-full rounded-xl border-gray-300 text-sm focus:ring-primary focus:border-primary p-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-all shadow-sm resize-none"></textarea>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-end">
+                    <button type="submit" class="px-8 py-3 bg-primary text-white rounded-xl text-sm font-bold hover:bg-indigo-600 transition-all shadow-lg hover:shadow-indigo-500/30 transform hover:-translate-y-0.5 dark:hover:bg-indigo-500 flex items-center">
+                        <i class="fa-solid fa-paper-plane mr-2"></i> Gönder
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes fade-in {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+    animation: fade-in 0.3s ease-out forwards;
+}
+</style>
+{% endblock %}

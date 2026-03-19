@@ -202,6 +202,19 @@ def iyzico_payment_callback(request):
         messages.error(request, f"Ödeme doğrulanırken bir hata oluştu: {str(e)}")
         return redirect('pricing')
 
+@login_required
+def feedback_page(request):
+    if request.method == 'POST':
+        feedback_type = request.POST.get('feedback_type')
+        message = request.POST.get('message')
+        
+        # Here you would typically save it to a database or send an email.
+        # For now, we'll just show a success message.
+        messages.success(request, 'Geri bildiriminiz başarıyla alındı. Teşekkür ederiz!')
+        return redirect('dashboard')
+        
+    return render(request, 'feedback.html')
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer

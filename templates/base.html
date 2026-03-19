@@ -77,6 +77,10 @@
                         <i class="fa-solid fa-gear w-5"></i>
                         <span>Ayarlar</span>
                     </a>
+                    <a href="{% url 'feedback' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-xl hover:bg-gray-50 hover:text-primary transition-colors dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white {% if 'feedback' in request.path %}bg-indigo-50 text-primary font-medium dark:bg-gray-700 dark:text-white{% endif %}">
+                        <i class="fa-solid fa-comment-dots w-5"></i>
+                        <span>Geri Bildirim</span>
+                    </a>
                 </div>
             </nav>
 

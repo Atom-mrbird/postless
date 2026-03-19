@@ -27,7 +27,7 @@ class AutomationStrategy(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='automation_strategies')
     title = models.CharField(max_length=100, help_text="Strategy Name (e.g., Daily Cat Facts)")
     concept_prompt = models.TextField(help_text="The core concept for AI generation")
     platform = models.CharField(max_length=20, choices=PLATFORM_CHOICES)
@@ -42,6 +42,7 @@ class AutomationStrategy(models.Model):
     class Meta:
         verbose_name = "Automation Strategy"
         verbose_name_plural = "Automation Strategies"
+        ordering = ['-created_at']
 
     def __str__(self):
         return f"{self.title} - {self.user.username} ({self.get_frequency_display()})"

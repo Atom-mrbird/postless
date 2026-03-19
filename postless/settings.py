@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-vf*0g94mj7j_m$0@)edp6%ffp$rlj*0efoxgcfe&z+u!!7=odd')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     'www.postless.solutions',
@@ -35,7 +35,7 @@ ALLOWED_HOSTS = [
 CSRF_TRUSTED_ORIGINS = [
     'https://postless.solutions',
     'https://www.postless.solutions',
-    'https://plankton-app-wjaj8.ondigitalocean.app/'
+    'https://plankton-app-wjaj8.ondigitalocean.app'
 ]
 APPEND_SLASH=False
 # Session and Cookie Settings for Ngrok/HTTPS
@@ -43,9 +43,6 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-# Bunları sil veya yorum satırı yap
-SESSION_COOKIE_DOMAIN = 'www.postless.solutions'
-CSRF_COOKIE_DOMAIN = 'www.postless.solutions'
 SESSION_COOKIE_AGE = 2592000  # 30 days
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 # Application definition
@@ -75,6 +72,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'users.middleware.SubscriptionMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
@@ -102,29 +100,21 @@ WSGI_APPLICATION = 'postless.wsgi.application'
 ASGI_APPLICATION = 'postless.asgi.application'
 
 
-IYZICO_API_KEY = os.environ.get('IYZICO_API_KEY', 'sandbox-A51P519o6I1L9q5y2Q0A5Y7V6X4J8u3w')
-IYZICO_SECRET_KEY = os.environ.get('IYZICO_SECRET_KEY', 'sandbox-S6v0L2J5q7V4w1O9n3B8M5X2U1G4k6e')
-IYZICO_BASE_URL = os.environ.get('IYZICO_BASE_URL', 'https://sandbox-api.iyzipay.com')
-IYZICO_CALLBACK_URL = 'https://www.postless.solutions/users/payment/callback/'
+# Iyzico Settings
+# IYZICO_API_KEY = os.environ.get('IYZICO_API_KEY', 'sandbox-A51P519o6I1L9q5y2Q0A5Y7V6X4J8u3w')
+# IYZICO_SECRET_KEY = os.environ.get('IYZICO_SECRET_KEY', 'sandbox-S6v0L2J5q7V4w1O9n3B8M5X2U1G4k6e')
+# IYZICO_BASE_URL = os.environ.get('IYZICO_BASE_URL', 'https://sandbox-api.iyzipay.com')
+# IYZICO_CALLBACK_URL = 'https://www.postless.solutions/users/payment/callback/'
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-
-if DEBUG:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
-else:
-    DATABASES = {
+DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'db',  # verdiğin database
-            'USER': 'db',  # verdiğin username
-            'PASSWORD': 'AVNS_kj9z33rUw0vsBSloo3e',
-            'HOST': 'app-bd606cdd-0359-4572-a801-a167e60e9940-do-user-34680255-0.k.db.ondigitalocean.com',
+            'NAME': 'dev-db-537258',  # verdiğin database
+            'USER': 'dev-db-537258',  # verdiğin username
+            'PASSWORD': 'AVNS_WsfMCMBY6Ymx3EVRIxw',
+            'HOST': 'app-9ed79859-eaa0-4b95-8bbf-2379142d0680-do-user-34772740-0.l.db.ondigitalocean.com',
             'PORT': '25060',
             'OPTIONS': {
                 'sslmode': 'require',
@@ -167,39 +157,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-USE_S3 = os.environ.get('USE_S3') == 'TRUE' or os.environ.get('BUCKET_NAME') is not None
-if USE_S3:
-    STORAGES = {
-        "default": {
-            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-            "OPTIONS": {
-                "access_key": os.environ.get("BUCKET_ACCESS_KEY"),
-                "secret_key": os.environ.get("BUCKET_SECRET_KEY"),
-                "bucket_name": os.environ.get("BUCKET_NAME"),
-                "region_name": os.environ.get("BUCKET_REGION"),
-                "endpoint_url": os.environ.get("BUCKET_ENDPOINT"),
-            }
-        },
-        "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-        },
-    }
-
-
-    # Custom Domain
-    AWS_S3_CUSTOM_DOMAIN = f"{os.environ.get('BUCKET_NAME')}.{os.environ.get('BUCKET_ENDPOINT').split('//')[1]}" if os.environ.get('BUCKET_ENDPOINT') and '//' in os.environ.get('BUCKET_ENDPOINT') else None
-    
-    endpoint = os.environ.get('BUCKET_ENDPOINT', '')
-    if endpoint and not endpoint.endswith('/'):
-        endpoint += '/'
-    MEDIA_URL = endpoint
-
-else:
-    MEDIA_URL = "https://postless-media-8ndofd7w8o.t3.storageapi.dev/"
-    MEDIA_ROOT = BASE_DIR / 'uploads'
+MEDIA_URL = "/uploads/"
+MEDIA_ROOT = BASE_DIR / 'uploads'
 
 AUTH_USER_MODEL = 'users.User'
 
