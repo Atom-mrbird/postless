@@ -29,11 +29,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'www.postless.solutions',
-    'postless.solutions'
+    'postless.solutions',
+    'urchin-app-dqni8.ondigitalocean.app'
 ]
 CSRF_TRUSTED_ORIGINS = [
     'https://postless.solutions',
     'https://www.postless.solutions'
+    'https://urchin-app-dqni8.ondigitalocean.app'
 ]
 APPEND_SLASH=False
 # Session and Cookie Settings for Ngrok/HTTPS
@@ -41,7 +43,11 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
+# Bunları sil veya yorum satırı yap
+# SESSION_COOKIE_DOMAIN = 'www.postless.solutions'
+# CSRF_COOKIE_DOMAIN = 'www.postless.solutions'
+SESSION_COOKIE_AGE = 2592000  # 30 days
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 # Application definition
 
 INSTALLED_APPS = [
@@ -69,7 +75,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'users.middleware.SubscriptionMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
@@ -97,7 +102,6 @@ WSGI_APPLICATION = 'postless.wsgi.application'
 ASGI_APPLICATION = 'postless.asgi.application'
 
 
-# Iyzico Settings
 IYZICO_API_KEY = os.environ.get('IYZICO_API_KEY', 'sandbox-A51P519o6I1L9q5y2Q0A5Y7V6X4J8u3w')
 IYZICO_SECRET_KEY = os.environ.get('IYZICO_SECRET_KEY', 'sandbox-S6v0L2J5q7V4w1O9n3B8M5X2U1G4k6e')
 IYZICO_BASE_URL = os.environ.get('IYZICO_BASE_URL', 'https://sandbox-api.iyzipay.com')

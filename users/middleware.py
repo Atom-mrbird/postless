@@ -25,16 +25,21 @@ class SubscriptionMiddleware:
             return self.get_response(request)
 
         # 2. Check subscription for authenticated users
+        # users/middleware.py
+
+# ... önceki kısımlar ...
+        # 2. Check subscription for authenticated users
         if request.user.is_authenticated:
-            # Allow superusers full access
             if request.user.is_superuser:
                 return self.get_response(request)
 
-            # Check if user has a subscription and if it's valid
+            # EĞER BURAYA GELİYORSA KULLANICI GİRİŞ YAPMIŞTIR
             subscription = getattr(request.user, 'subscription', None)
             if not subscription or not subscription.is_active_or_trial:
-                messages.warning(request, "Sistemi kullanmak için aktif bir aboneliğiniz olmalıdır.")
-                # Redirect to your payment or pricing view
                 return redirect('/pricing/')
+        else:
+            # Kullanıcı giriş yapmamışsa abonelik kontrolü yapma, 
+            # bırak Django'nun kendi login_required dekoratörleri çalışsın.
+            pass 
 
         return self.get_response(request)
