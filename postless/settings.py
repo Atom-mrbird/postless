@@ -34,23 +34,17 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost'
 ]
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_SAVE_EVERY_REQUEST = True
+
+# Trusted Origins listesini güncelleyin (Slash işaretlerine dikkat):
 CSRF_TRUSTED_ORIGINS = [
     'https://postless.solutions',
     'https://www.postless.solutions',
-    'https://plankton-app-wjaj8.ondigitalocean.app'
 ]
-APPEND_SLASH=False
-
-# Session and Cookie Settings
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-# ÇOK ÖNEMLİ: Lokal ortamda (HTTP) çalışabilmesi için DEBUG moduna bağladık. 
-# Eğer HTTPS yoksa ve bu True ise login işlemi başarısız olur!
-SESSION_COOKIE_SECURE = not DEBUG 
-CSRF_COOKIE_SECURE = not DEBUG
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SESSION_COOKIE_AGE = 2592000  # 30 days
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-SESSION_SAVE_EVERY_REQUEST = True
 
 # Application definition
 
