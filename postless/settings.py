@@ -42,7 +42,8 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_SAVE_EVERY_REQUEST = True
-
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
 # 4. PROXY AYARI (DigitalOcean için şart)
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Trusted Origins listesini güncelleyin (Slash işaretlerine dikkat):
