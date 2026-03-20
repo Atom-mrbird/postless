@@ -37,9 +37,11 @@ ALLOWED_HOSTS = [
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_COOKIE_SAMESITE = 'Lax'
+
+# 4. PROXY AYARI (DigitalOcean için şart)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Trusted Origins listesini güncelleyin (Slash işaretlerine dikkat):
 CSRF_TRUSTED_ORIGINS = [
     'https://postless.solutions',
@@ -73,6 +75,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'users.middleware.SubscriptionMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
