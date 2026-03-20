@@ -15,7 +15,6 @@ from django.http import HttpResponse, JsonResponse, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 import json
 import base64
-from urllib.parse import urlencode
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm
@@ -24,7 +23,7 @@ import datetime
 from .forms import SignUpForm, UserUpdateForm
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode, urlencode
 from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
@@ -354,14 +353,14 @@ class SocialAccountViewSet(viewsets.ModelViewSet):
     def youtube_callback(self, request):
         state_encoded = request.GET.get('state')
         user = request.user
+        # views.py içinde hem instagram_callback hem youtube_callback için:
         if not user.is_authenticated and state_encoded:
             try:
-                state_json = base64.urlsafe_b64decode(state_encoded).decode()
-                state_data = json.loads(state_json)
-                user_id = state_data.get('user_id')
-                if user_id:
-                    user = User.objects.get(id=user_id)
-            except:
+                # ... decode işlemleri ...
+                user = User.objects.get(id=user)
+                # KRİTİK EKSİK BURASI:
+                login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            except Exception:
                 pass
         if not user or not user.is_authenticated:
              return redirect('/accounts/login/?next=/connections/')
