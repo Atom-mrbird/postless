@@ -39,7 +39,7 @@ CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_SAVE_EVERY_REQUEST = True
-
+SESSION_COOKIE_SAMESITE = 'Lax'
 # Trusted Origins listesini güncelleyin (Slash işaretlerine dikkat):
 CSRF_TRUSTED_ORIGINS = [
     'https://postless.solutions',
