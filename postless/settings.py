@@ -30,8 +30,9 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'www.postless.solutions',
     'postless.solutions',
-    'plankton-app-wjaj8.ondigitalocean.app'
-    '127.0.0.1'
+    'plankton-app-wjaj8.ondigitalocean.app',
+    '127.0.0.1',
+    'localhost'
 ]
 CSRF_TRUSTED_ORIGINS = [
     'https://postless.solutions',
@@ -39,13 +40,17 @@ CSRF_TRUSTED_ORIGINS = [
     'https://plankton-app-wjaj8.ondigitalocean.app'
 ]
 APPEND_SLASH=False
-# Session and Cookie Settings for Ngrok/HTTPS
+
+# Session and Cookie Settings
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+# ÇOK ÖNEMLİ: Lokal ortamda (HTTP) çalışabilmesi için DEBUG moduna bağladık. 
+# Eğer HTTPS yoksa ve bu True ise login işlemi başarısız olur!
+SESSION_COOKIE_SECURE = not DEBUG 
+CSRF_COOKIE_SECURE = not DEBUG
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_AGE = 2592000  # 30 days
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -111,15 +116,8 @@ IYZICO_CALLBACK_URL = 'https://www.postless.solutions/users/payment/callback/'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'dev-db-537258',  # verdiğin database
-            'USER': 'dev-db-537258',  # verdiğin username
-            'PASSWORD': 'AVNS_WsfMCMBY6Ymx3EVRIxw',
-            'HOST': 'app-9ed79859-eaa0-4b95-8bbf-2379142d0680-do-user-34772740-0.l.db.ondigitalocean.com',
-            'PORT': '25060',
-            'OPTIONS': {
-                'sslmode': 'require',
-            },
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
 
