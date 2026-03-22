@@ -1,0 +1,17 @@
+[build]
+builder = "nixpacks"
+# Statik dosyaları toplamak ve veritabanı migration'larını otomatik yapmak için
+buildCommand = "python manage.py collectstatic --noinput && python manage.py migrate"
+
+[deploy]
+startCommand = "daphne postless.asgi:application --port $PORT --bind 0.0.0.0"
+restartPolicyType = "on-failure"
+restartPolicyMaxRetries = 10
+
+# Celery Worker Servisi
+[services.worker]
+startCommand = "celery -A postless worker --loglevel=info"
+
+# Celery Beat Servisi
+[services.beat]
+startCommand = "celery -A postless beat --loglevel=info"
