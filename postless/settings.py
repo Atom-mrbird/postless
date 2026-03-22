@@ -167,12 +167,22 @@ AUTH_USER_MODEL = 'users.User'
 
 # Fallback to local Redis if the environment variable is not set
 # Change this line
-REDIS_URL = "redis://db:AVNS_lRBcMaoGv2jCJEun6cw@app-b1a900f9-f395-4476-9ac2-863065cab40b-do-user-34772740-0.h.db.ondigitalocean.com:25060"
+if REDIS_URL and REDIS_URL.startswith('redis://') and 'ondigitalocean.com' in REDIS_URL:
+    REDIS_URL = REDIS_URL.replace('redis://', 'rediss://', 1)
 
 # Celery Configuration
 from celery.schedules import crontab
 CELERY_BROKER_URL = REDIS_URL
 CELERY_RESULT_BACKEND = REDIS_URL
+
+if REDIS_URL and REDIS_URL.startswith('rediss://'):
+    CELERY_BROKER_USE_SSL = {
+        'ssl_cert_reqs': 'none'
+    }
+    CELERY_REDIS_BACKEND_USE_SSL = {
+        'ssl_cert_reqs': 'none'
+    }
+
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
