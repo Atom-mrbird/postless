@@ -115,15 +115,8 @@ IYZICO_CALLBACK_URL = 'https://www.postless.solutions/users/payment/callback/'
 # Database configuration specific to DigitalOcean
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'dev-db-537258',
-        'USER': 'dev-db-537258',
-        'PASSWORD': 'AVNS_WsfMCMBY6Ymx3EVRIxw',
-        'HOST': 'app-9ed79859-eaa0-4b95-8bbf-2379142d0680-do-user-34772740-0.l.db.ondigitalocean.com',
-        'PORT': '25060',
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
