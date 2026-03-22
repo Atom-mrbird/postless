@@ -167,7 +167,7 @@ AUTH_USER_MODEL = 'users.User'
 
 # Fallback to local Redis if the environment variable is not set
 # Change this line
-REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+REDIS_URL = "redis://redis:6379/0"
 
 # Celery Configuration
 from celery.schedules import crontab
