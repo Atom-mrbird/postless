@@ -30,7 +30,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'www.postless.solutions',
     'postless.solutions',
-    'plankton-app-wjaj8.ondigitalocean.app',
+    'seal-app-vl3uj.ondigitalocean.app',
     '127.0.0.1',
     'localhost',
     '*' # Add wildcard to ensure DO health checks don't fail due to IP address
