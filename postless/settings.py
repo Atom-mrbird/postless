@@ -32,8 +32,10 @@ ALLOWED_HOSTS = [
     'postless.solutions',
     'plankton-app-wjaj8.ondigitalocean.app',
     '127.0.0.1',
-    'localhost'
+    'localhost',
+    '*' # Add wildcard to ensure DO health checks don't fail due to IP address
 ]
+
 # Tüm domain karmaşasını bitiren ayar
 SESSION_COOKIE_DOMAIN = None
 CSRF_COOKIE_DOMAIN = None
@@ -43,6 +45,227 @@ CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_SAVE_EVERY_REQUEST = True
 
+# 4. PROXY AYARI (DigitalOcean için şart)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# Trusted Origins listesini güncelleyin (Slash işaretlerine dikkat):
+CSRF_TRUSTED_ORIGINS = [
+    'https://postless.solutions',
+    'https://www.postless.solutions',
+    'https://plankton-app-wjaj8.ondigitalocean.app'
+]
+APPEND_SLASH=False
+
+# Application definition
+
+INSTALLED_APPS = [
+    'daphne',
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'users',
+    'content',
+    'ai_generation',
+    'scheduling',
+    'publishing',
+    'analytics',
+    'storages',
+]
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'users.middleware.SubscriptionMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+]
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+ROOT_URLCONF = 'postless.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates']
+        ,
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+WSGI_APPLICATION = 'postless.wsgi.application'
+ASGI_APPLICATION = 'postless.asgi.application'
+
+
+# Iyzico Settings
+IYZICO_API_KEY = os.environ.get('IYZICO_API_KEY', 'sandbox-A51P519o6I1L9q5y2Q0A5Y7V6X4J8u3w')
+IYZICO_SECRET_KEY = os.environ.get('IYZICO_SECRET_KEY', 'sandbox-S6v0L2J5q7V4w1O9n3B8M5X2U1G4k6e')
+IYZICO_BASE_URL = os.environ.get('IYZICO_BASE_URL', 'https://sandbox-api.iyzipay.com')
+IYZICO_CALLBACK_URL = 'https://www.postless.solutions/users/payment/callback/'
+
+# Database configuration specific to DigitalOcean
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'dev-db-537258',
+        'USER': 'dev-db-537258',
+        'PASSWORD': 'AVNS_WsfMCMBY6Ymx3EVRIxw',
+        'HOST': 'app-9ed79859-eaa0-4b95-8bbf-2379142d0680-do-user-34772740-0.l.db.ondigitalocean.com',
+        'PORT': '25060',
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
+    }
+}
+
+
+# Password validation
+# https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
+
+
+# Internationalization
+# https://docs.djangoproject.com/en/6.0/topics/i18n/
+
+LANGUAGE_CODE = 'en-us'
+
+TIME_ZONE = 'Europe/Istanbul'
+
+USE_I18N = True
+
+USE_TZ = True
+
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/6.0/howto/static-files/
+
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+MEDIA_URL = "/uploads/"
+MEDIA_ROOT = BASE_DIR / 'uploads'
+
+AUTH_USER_MODEL = 'users.User'
+
+# Redis Configuration
+REDIS_URL = os.environ.get("REDIS_URL")
+
+# Make absolutely sure DigitalOcean Redis uses rediss:// (TLS)
+if REDIS_URL and REDIS_URL.startswith('redis://') and ('ondigitalocean' in REDIS_URL or 'db' in REDIS_URL):
+    REDIS_URL = REDIS_URL.replace('redis://', 'rediss://', 1)
+
+if not REDIS_URL:
+    REDIS_URL = "redis://localhost:6379/0"
+
+# Celery Configuration
+from celery.schedules import crontab
+
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
+
+if REDIS_URL.startswith('rediss://'):
+    CELERY_BROKER_USE_SSL = {
+        'ssl_cert_reqs': 'none'
+    }
+    CELERY_REDIS_BACKEND_USE_SSL = {
+        'ssl_cert_reqs': 'none'
+    }
+
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
+
+
+# Facebook / Instagram Graph API Configuration
+FACEBOOK_APP_ID = os.environ.get('FACEBOOK_APP_ID', '5252245341667289')
+FACEBOOK_APP_SECRET = os.environ.get('FACEBOOK_APP_SECRET', '63af153f0b1d4ca16f8c5ef2765e5d62')
+
+# Bu değişken kodda kullanılmıyor olabilir, ancak tutarlılık için callback adresiyle aynı olması önerilir
+FACEBOOK_OAUTH_REDIRECT_URI = 'https://www.postless.solutions/api/social-accounts/instagram_callback/'
+
+# Instagram Configuration
+INSTAGRAM_APP_ID = '1640423764050164'
+INSTAGRAM_CLIENT_SECRET = 'ba98f80f287a12789caaeaf1d70ad490'
+INSTAGRAM_REDIRECT_URI = 'https://www.postless.solutions/api/social-accounts/instagram_callback/'
+INSTAGRAM_ACCESS_TOKEN = 'EABKo46ncZC9kBQ82nC4Va0NwXMgpVLCC4ZAQTDJ734UFUEm2OkmOKM3t84MrV9baG81JNpT27zHZCcOHL9teZApEE4r6dWslHYzEUZCb0WgNc8viBZBYZBZCA6FBIv97V1CMZCiNfhZCiyfw2M7PKHeejIC8QaFHVKNZCvuNDDSNQPJHHELtZAgZBZB78wX2JM97Pghn4fqld0NPBfjZBHlZAQZDZD'
+INSTAGRAM_ACCOUNT_ID = '17841480699522650'
+META_WEBHOOK_VERIFY_TOKEN = os.environ.get(
+    "META_WEBHOOK_VERIFY_TOKEN",
+    "postless_webhook_verify_7fA9kL2026"
+)
+
+# YouTube Configuration
+YOUTUBE_CLIENT_ID = os.environ.get('YOUTUBE_CLIENT_ID', '935602501203-vfpajcescc17kg3nbei7ck8nrulf33k7.apps.googleusercontent.com')
+YOUTUBE_CLIENT_SECRET = os.environ.get('YOUTUBE_CLIENT_SECRET', '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')
+YOUTUBE_REDIRECT_URI = 'https://www.postless.solutions/api/social-accounts/youtube_callback/'
+
+# OpenAI Configuration
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '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')
+
+# RunwayML Configuration
+RUNWAYML_API_KEY = os.environ.get('RUNWAYML_API_KEY', 'key_76eb6d620d1a890cd99712eeae233911dbea878d437209e19735b6b6863f1bfd75d3b1e1d83f26ccd4e18163b49be6abef4d8c1b1803687316104d3f2d4d2934')
+
+# Celery Beat Schedule
+CELERY_BEAT_SCHEDULE = {
+    "CHECK_SCHEDULED_POSTS_EVERY_MINUTE": {
+        "task": "publishing.tasks.process_scheduled_posts",
+        "schedule": 60.0,
+    },
+    "CHECK_AUTOMATION_STRATEGIES_HOURLY": {
+        "task": "ai_generation.tasks.check_automation_strategies",
+        "schedule": crontab(minute=0), # Every hour
+    },
+}
+
+# Email Configuration (Gmail SMTP)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'ataberk@postless.solutions'
+EMAIL_HOST_PASSWORD = 'gkkznhmlhtndpknd'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+# Tüm domain karmaşasını bitiren ayar
+SESSION_COOKIE_DOMAIN = None
+CSRF_COOKIE_DOMAIN = None
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_SAVE_EVERY_REQUEST = True
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
 # 4. PROXY AYARI (DigitalOcean için şart)
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Trusted Origins listesini güncelleyin (Slash işaretlerine dikkat):
@@ -165,12 +388,23 @@ MEDIA_ROOT = BASE_DIR / 'uploads'
 AUTH_USER_MODEL = 'users.User'
 
 # Fallback to local Redis if the environment variable is not set
-REDIS_URL = os.environ.get("REDIS_URL")
+# Change this line
+if REDIS_URL and REDIS_URL.startswith('redis://') and 'ondigitalocean.com' in REDIS_URL:
+    REDIS_URL = REDIS_URL.replace('redis://', 'rediss://', 1)
 
 # Celery Configuration
 from celery.schedules import crontab
 CELERY_BROKER_URL = REDIS_URL
 CELERY_RESULT_BACKEND = REDIS_URL
+
+if REDIS_URL and REDIS_URL.startswith('rediss://'):
+    CELERY_BROKER_USE_SSL = {
+        'ssl_cert_reqs': 'none'
+    }
+    CELERY_REDIS_BACKEND_USE_SSL = {
+        'ssl_cert_reqs': 'none'
+    }
+
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'

@@ -17,3 +17,4 @@ iyzipay==1.0.46
 gunicorn
 whitenoise
 django-storages[s3]
+channels
