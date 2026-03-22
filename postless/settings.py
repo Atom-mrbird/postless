@@ -29,19 +29,16 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'www.postless.solutions',
-    'postless.solutions',
-    'seal-app-vl3uj.ondigitalocean.app',
-    '127.0.0.1',
-    'localhost',
-    '*' # Add wildcard to ensure DO health checks don't fail due to IP address
+    'postless.solutions'
+    # Add wildcard to ensure DO health checks don't fail due to IP address
 ]
 
 # Tüm domain karmaşasını bitiren ayar
 SESSION_COOKIE_DOMAIN = None
 CSRF_COOKIE_DOMAIN = None
 
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_SAVE_EVERY_REQUEST = True
 
@@ -50,8 +47,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Trusted Origins listesini güncelleyin (Slash işaretlerine dikkat):
 CSRF_TRUSTED_ORIGINS = [
     'https://postless.solutions',
-    'https://www.postless.solutions',
-    'https://seal-app-vl3uj.ondigitalocean.app'
+    'https://www.postless.solutions'
 ]
 APPEND_SLASH=False
 
